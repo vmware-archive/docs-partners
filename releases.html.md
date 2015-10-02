@@ -48,7 +48,7 @@ To have confidence that the customer can successfully install the product on the
 1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product
   1. Populate all of the required fields
   1. Make sure the release version states **BETA**
-  1. Make sure the release description states this product is not upgradeable and may suffere data loss.
+  1. Make sure the release description states this product is not upgradeable and may suffer data loss.
 1. E-mail your Pivotal contact asking for them to validate the product and release and make it viewable to customers
   1. Please provide some basic instructions on how to validate the new feature set
 
@@ -65,19 +65,68 @@ This is useful as you can get a wider range of feedback and still continue to it
 You may release multiple versions of the tile whilst you are in public beta.
 
 ### Requirements
-The minimum requirements / characteristicsfor a product to be in public beta are:
+The minimum requirements / characteristics for a product to be in public beta are:
 
 * Met all requirements of the closed beta phase
-* 
+* The tile is upgradeable between versions, it does not require the customer to un-install the previous version
+  * Upgrade paths cover minor and all patches to the next minor and all its patches
+* Tile has being built / validated at least once on all available IaaS (vSphere, AWS, Openstack)
+* There is no data or configuration loss between upgrades of tile versions
+* You can respond to a CVE within a reasonable period of timelines
+  * Either on the stemcell or within one of the components of your tile
+  * For reference, Pivotal aims to respond to all critical CVEs within 48 hours
+* As a vendor you feel comfortable you can now support this tile for customers
 
 ### Test coverage
+To have confidence in your product and that you have met these requirements, the following test scenarios should be covered:
+
+* All of the items in the closed beta list
+* Upgrades work correctly
+* There is no data or configuration loss between versions
+* The service is available and working after an upgrade
+* Integration points with PCF
+  * e.g. any registered routes, UAA, service brokers
 
 ### Steps to release
 1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product
   1. Populate all of the required fields
   1. Make sure the release version states **BETA**
-  1. Make sure the release description states this product is not upgradeable and may suffere data loss.
 1. E-mail your Pivotal contact asking for them to validate the product and release and make it viewable to customers
   1. Please provide some basic instructions on how to validate the new feature set
+  1. We will validate the upgrade scenario and data persistence
 
 ## Phase 3 - Generally Available
+
+Generally available signifies that the product is widely available to any customer, it is considered production ready and as a vendor you want to start charging money for this product and provide the relevant support guarantees to your customers. The product feature set and quality is representative of the standard that your company wishes to uphold with customers.
+
+### Requirements
+The minimum requirements / characteristics for a product to be generally available are:
+
+* All requirements for closed & public beta are met
+* It is considered production ready
+* Customer support can be provided
+* Go to market work has being completed
+* Product can scale vertically
+* Product can scale horizontally to be HA - if appropriate
+* Product requires no internet connection to be installed
+* Zero-downtime deploys - if appropriate
+
+### Test coverage
+To have confidence in your product for GA and that you have met these requirements, the following test scenarios should be covered:
+
+* All of the items for the closed & public beta are covered
+* Scaling vertically such as increasing the amount of RAM, CPU
+  * is successful and does not result in data loss
+* Horizontal Scaling
+  * Validate scaled out nodes are used correctly
+  * Taking a node offline does not result in downtime
+* Zero-downtime deployments
+  * If the product has HA components
+* Adequate unit and functional tests to ensure high quality
+
+### Steps to release
+1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product
+  1. Populate all of the required fields
+1. E-mail your Pivotal contact asking for them to validate the product and release and make it viewable to customers
+  1. Please provide some basic instructions on how to validate the new feature set
+  1. We will validate the upgrade scenario and data persistence
