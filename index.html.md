@@ -28,4 +28,4 @@ Visit the [OpsManager documentation](http://docs.pivotal.io/pivotalcf/packaging/
 
 To release a brand new product to a customer, it may go through several stages of release. Each of these stages has different levels of visibility to customers and associated quality and testing requirements that must be met.
 
-These are detailed in full [here](partners/quality.html)
+These are detailed in full [here](partners/releases.html)
