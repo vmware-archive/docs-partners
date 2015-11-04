@@ -1,132 +1,140 @@
 ---
-title: Partner Documentation - Release phases
+title: Release Cycle
 ---
 
-# Release cycle
+Releasing a product to Pivotal Cloud Foundry (PCF) involves four phases, detailed below:
 
-There are four typical and recommended stages to releasing a product to a customer.
+## <a id='alpha'></a>Phase 1: Alpha
 
-The timelines for moving between each stage will vary by customer and depend upon your product and feature set. Based on experience though, we recommend allowing at least a month for the product to be in Public Beta before moving to GA.
+Alpha is the initial development phase for a product. The product is under constant churn and refactoring, and may not be feature-complete.
 
-## Phase 0 - Alpha
+This is an internal testing phase with no exposure to customers, so there are no quality requirements in this phase.
 
-This is the beginnings of your product, when it is in its development stage. The product may be under constant churn and refactoring and may not be feature complete.
+## <a id='closed-beta'></a>Phase 2:  Closed Beta
 
-You may be testing this internally, not with customers. So there are no quality requirements at this stage.
+During **Closed Beta**, releases of the product are exposed to a limited pool of users in order to gather feedback. This feedback is used to drive further development.
 
-## Phase 1 - Closed Beta
+A status of Closed Beta informs users that the product may be unstable and should not be used in production.
 
-Closed Beta is for when you have a version of your product that you feel is relatively stable and you are keen to get feedback on from customers.
+A product should remain in Closed Beta while:
 
-It can be made available on [Pivotal Network](http://network.pivotal.io) to specific groups or individual customers upon request.
+- Changes may break product function or cause loss of data
+- Users may experience major bugs
+- Users may have to delete and reinstall tiles rather than upgrading
 
-Being in closed beta gives you the freedom to make breaking changes, fix any big bugs, suffer potential data loss and advise the customer that they need to delete the tile in between versions.
-
-This is useful as you receive customer feedback that may alter your approach to the product and features that you are delivering.
-
-You may release multiple versions of the tile whilst you are in closed beta.
+Developers make products in closed beta available to specific groups or individual customers on [Pivotal Network](http://network.pivotal.io).
 
 ### Requirements
-The minimum requirements / characteristics for a product to be in closed beta are:
+Products in Closed Beta must meet the following requirements:
 
-* Tested on at least one IaaS (either AWS, vSphere or Openstack)
-* Not recommended for use in production - due to potential data loss and lack of support
-* Targets the [stemcell version](https://network.pivotal.io/products/stemcells) of the latest available Pivotal OpsManager
-* Product doesnt have to be upgradeable between versions
-  * Expectations set clearly with customers on the release notes they have to delete the tile before installing the next version
+* The product must be tested on at least one IaaS (either AWS, vSphere or Openstack).
+
+* The product tile must target the [stemcell version](https://network.pivotal.io/products/stemcells) of the latest available Pivotal OpsManager.
+
+* The release notes must make the following clear:
+
+  * The product is **not** suitable for use in production, due to potential data loss and lack of support.
+
+  * To move to the next version of the product, users will need to delete the old tile and install a new one, as there will be no upgrade path.
 
 
-### Test coverage
-To have confidence that the customer can successfully install the product on their environment and not cause any issues, the following test scenarios should have being validated.
+### Test Coverage
+The following test scenarios must be validated:
 
-* Tile can be installed successfully without any errors
-* Tile can be deleted successfully and leaves no trace behind
-* Tile has a valid stemcell reference that is available on [Pivotal Network](https://network.pivotal.io/products/stemcells)
-* The desired feature set of the product has being validated as functional enough to provide the desired feedback
+* The product tile can be installed successfully without any errors.
+* The product tile can be deleted successfully and leaves no trace behind.
+* The product tile has a valid stemcell reference that is available on [Pivotal Network](https://network.pivotal.io/products/stemcells).
+* The desired feature set of the product has being validated as functional enough to provide the desired feedback.
 
-### Steps to release
-1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product
-  1. Populate all of the required fields
-  1. Make sure the release version states **BETA**
+### Steps to Release
+1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product by completing the following steps.
+  1. Populate all of the required fields.
+  1. Make sure the release version states **BETA**.
   1. Make sure the release description states this product is not upgradeable and may suffer data loss.
-1. E-mail your Pivotal contact asking for them to validate the product and release and make it viewable to customers
-  1. Please provide some basic instructions on how to validate the new feature set
+1. E-mail your Pivotal contact asking for them to validate the product and release and make it viewable to customers. Please provide some basic instructions on how to validate the new feature set.
 
-## Phase 2 - Public Beta
+## <a id='public-beta'></a>Phase 3: Public Beta
 
-Public Beta is for when you have a version of the product that you want to get wider feedback on, announce its public beta availability and you are comfortable requires no more breaking changes as it is more stable.
+In Public Beta, your product is available to the general public. This allows you to gather more feedback, from a wider pool of users. It also increases public awareness of the product, facilitating marketing and advertising. As development continues, a series of product versions may appear in Public Beta.
 
-It will be made available on [Pivotal Network](http://network.pivotal.io) to the general public, only logged in users will be able to download it.
+**Public Beta** is appropriate for your product if it meets the following conditions:
 
-Being in public beta allows you to seek feedback from a wider audience and start advertising and marketing the product. As it is a beta product, there of course may still be a few bugs that encounter and it may not contain the full feature set of the GA product.
+- You are confident that further development will not entail breaking changes or data loss.
+- The tile is upgradeable.
+- You need user feedback to discover minor bugs and evaluate existing features.
+- The product does not contain the full set of features intended for the final release.
 
-This is useful as you can get a wider range of feedback and still continue to iterate on the product and add new features, based on this feedback.
-
-You may release multiple versions of the tile whilst you are in public beta.
+Products in Public Beta are available on [Pivotal Network](http://network.pivotal.io) to any user with a free Pivotal Network account.
 
 ### Requirements
-The minimum requirements / characteristics for a product to be in public beta are:
+Products in Public Beta must meet the following requirements: 
 
-* Met all requirements of the closed beta phase
-* The tile is upgradeable between versions, it does not require the customer to un-install the previous version
-  * Upgrade paths cover minor and all patches to the next minor and all its patches
-* Tile has being built / validated at least once on all available IaaS (vSphere, AWS, Openstack)
-* There is no data or configuration loss between upgrades of tile versions
-* You can respond to a CVE within a reasonable period of timelines
-  * Either on the stemcell or within one of the components of your tile
-  * For reference, Pivotal aims to respond to all critical CVEs within 48 hours
+* The product meets all requirements for [**Closed Beta**](#closed-beta).
+
+* The tile is upgradeable between versions. It does not require the customer to un-install the previous version. The product must support upgrade paths from any minor version, including its patches, to the next minor verion and its patches.
+
+* Your product tile has being validated at least once on all available IaaS (vSphere, AWS, Openstack).
+
+* There is no data or configuration loss between upgrades of tile versions.
+
+* You can respond to discovery of a security flaw on the [Common Vulnerabilities and Exposures (CVE) list](https://cve.mitre.org/cve/index.html) on a reasonable timeline. This includes vulnerabilities in your stemcell or within one of the components of your tile. For reference, Pivotal aims to respond to all critical CVEs within 48 hours.
+
 * As a vendor you feel comfortable you can now support this tile for customers
 
-### Test coverage
-To have confidence in your product and that you have met these requirements, the following test scenarios should be covered:
+### Test Coverage
+The following test scenarios must be validated:
 
-* All of the items in the closed beta list
-* Upgrades work correctly
-* There is no data or configuration loss between versions
-* The service is available and working after an upgrade
-* Integration points with PCF
-  * e.g. any registered routes, UAA, service brokers
+* Testing requirements for **Closed Beta** have been met.
+* Upgrades work correctly.
+* There is no data or configuration loss between versions.
+* The service is available and working after an upgrade.
+* Your product integrates properly with Pivotal Cloud Foundry, including:
+  * Registered routes
+  * UAA
+  * Service brokers
 
-### Steps to release
-1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product
+### Steps to Release
+
+1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product.
   1. Populate all of the required fields
-  1. Make sure the release version states **BETA**
-1. E-mail your Pivotal contact asking for them to validate the product and release and make it viewable to customers
-  1. Please provide some basic instructions on how to validate the new feature set
-  1. We will validate the upgrade scenario and data persistence
+  1. Make sure the release version states **BETA**.
+1. E-mail your Pivotal contact asking for them to validate the product and release it to customers. Please provide some basic instructions on how to validate the new feature set. We will validate the upgrade scenario and data persistence.
 
-## Phase 3 - Generally Available
+## <a id='ga'></a>Phase 4: Generally Available
 
-Generally available signifies that the product is widely available to any customer, it is considered production ready and as a vendor you want to start charging money for this product and provide the relevant support guarantees to your customers. The product feature set and quality is representative of the standard that your company wishes to uphold with customers.
+A product becomes **Generally Available** when:
+
+- It is ready for production.
+
+- You are ready to charge money for this product and provide support guarantees to your customers.
+
+- Your product's full set of features meet the standards of quality that your company wishes to uphold.
 
 ### Requirements
-The minimum requirements / characteristics for a product to be generally available are:
+**Generally Available** products must meet the following requirements: 
 
-* All requirements for closed & public beta are met
-* It is considered production ready
-* Customer support can be provided
-* Go to market work has being completed
-* Product can scale vertically
-* Product can scale horizontally to be HA - if appropriate
-* Product requires no internet connection to be installed
-* Zero-downtime deploys - if appropriate
+* All requirements for [**Public Beta**](#public-beta) are met.
+* It is considered production ready.
+* You can provide customer support.
+* "Go to market work" is complete.
+* The product can scale vertically.
+* If appropriate, the product can scale horizontally to meet the standards of 'high availability'.
+* If appropriate, the product supports zero downtime deployment.
+* Product installation does not require an internet connection.
 
-### Test coverage
-To have confidence in your product for GA and that you have met these requirements, the following test scenarios should be covered:
+### Test Coverage
+The following test scenarios must be validated:
 
-* All of the items for the closed & public beta are covered
-* Scaling vertically such as increasing the amount of RAM, CPU
-  * is successful and does not result in data loss
-* Horizontal Scaling
-  * Validate scaled out nodes are used correctly
-  * Taking a node offline does not result in downtime
-* Zero-downtime deployments
-  * If the product has HA components
-* Adequate unit and functional tests to ensure high quality
+* All testing scenarios for **Public Beta**.
+* Vertical scaling, such as increasing the amount of RAM and/or CPU, improves performance and does not result in data loss.
+* Horizontal Scaling:
+  * Scaled out nodes function correctly.
+  * Removing a node does not result in downtime.
+* Adequate unit and functional tests to ensure high quality.
 
-### Steps to release
-1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product
-  1. Populate all of the required fields
-1. E-mail your Pivotal contact asking for them to validate the product and release and make it viewable to customers
-  1. Please provide some basic instructions on how to validate the new feature set
-  1. We will validate the upgrade scenario and data persistence
+<!-- * Zero-downtime deployments:
+  * If the product has HA components" -->
+
+### Steps to Release
+1. Log into [Pivotal Network](http://network.pivotal.io) and create a new release for your product. Populate all of the required fields.
+1. E-mail your Pivotal contact asking for them to validate the product and release and make it discoverable to customers. Please provide some basic instructions on how to validate the new feature set. We will validate the upgrade scenario and data persistence.
