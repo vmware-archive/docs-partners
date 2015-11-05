@@ -1,0 +1,129 @@
+---
+title: Deploying Your Product as a Tile in Ops Manager
+---
+ 
+ <p class='note'><strong>Note</strong>: This topic is part of the [Creating a Pivotal Cloud Foundry® Product Tile](./creating) tutorial.  Before beginning this procedure, you should follow the procedure described in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html).</p>
+
+This topic describes the procedure for deploying a Cloud Foundry software product as a tile in [Pivotal Cloud Foundry&reg;](https://network.pivotal.io/products/pivotal-cf) (PCF) Ops Manager. Ops Manager offers a web GUI and eases the process of deploying software with BOSH by providing the following:
+
+- Automated error checking
+- Automated manifest generation
+- Life cycle management for upgrading a product when a new release is published.
+
+
+
+## <a id='deploy-ops-manager'></a>Step 1: Deploy Ops Manager
+
+Ops Manager is available on [Pivotal Network](http://network.pivotal.io). For the purpose of this step we will launch an Amazon AMI in the VPC that we used in the [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html) topic.
+
+1. Login to [Pivotal Network](http://network.pivotal.io) and download the latest Ops Manager for AWS. This is a PDF with the AMI ID.
+
+1. Login to the **AWS Console**.
+
+1. Navigate to the **EC2 Dashboard**.
+
+1. Click **Launch Instance**.
+
+1. Select **Community AMIs** and search for the Ops Manager AMI as printed in the PDF you downloaded from Pivotal Network.
+<%= image_tag 'ami_selection_aws.png' %>
+
+1. Click the **Select** button next to the Ops Manager AMI.
+
+1. Choose an m3.large instance and click Next: Configure Instance Details.
+
+1. Click the dropdown for the **Network** key and choose the VPC that you created in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html#prep-environment).
+
+1. Click the dropdown for the **Subnet** key and choose the public subnet that you created in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html)#prep-environment).
+
+1. Set **Auto-assign Public IP** to **Enable**.
+<%= image_tag 'vpc.png' %>
+
+1. Click **Review and Launch**.
+
+1. Edit the Security Group and set it to the OpsManagerSecurityGroup that you used in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html).
+
+1. Click **Launch**.
+
+1. Choose the keypair you created in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html) and accept the acknowledgement checkbox.
+<%= image_tag 'keypair.png' %>
+
+1. Click **Launch Instance**.
+
+## <a id='configure-install'></a>Step 2: Configure and Install Ops Manager Director
+
+1. Find the public IP address of the Ops Manager you deployed in the EC2 Dashboard.
+
+1. Open a browser and navigate to the Ops Manager IP address.
+
+1. Create a username and password, and agree to the terms and conditions.
+<%= image_tag 'username-pass.png' %>
+
+1. Click the **Ops Manager Director** Tile.<br>
+<%= image_tag 'director.png' %>
+
+1. Enter the **Access Key**, **Secret**, **VPC ID**, **Security Group**, **Key Pair**, **Private Key** and **Region** with the values you used in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html).
+
+1. Click **Save**.
+<%= image_tag 'aws-config.png' %>
+
+1. Select **Director Config**.
+
+1. Enter an Amazon NTP Server (0.amazon.pool.ntp.org) and click Save.
+
+1. Select **Create Availability Zone**.
+
+1. Enter the Availability Zone for the private subnet of your VPC (example: us-west-1a) and click **Save**.
+
+1. Select **Assign Availability Zone**.
+
+1. Choose the Availability Zone you created and click **Save**.
+
+1. Select **Create Networks**.
+
+1. Enter a **network name**, **Subnet ID**, **CIDR Range**, **Excluded IP range**, **DNS**, and **gateway** using the same values you used in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html).
+
+<p class='note'><strong>Note</strong>: you will get errors that Ops Manager cannot reach the gateway or DNS server.</p>
+<%= image_tag 'networks.png' %>
+
+1. Select **Assign Networks**.
+
+1. Choose the network you created and click **Save**.
+
+1. Click **Apply Changes** and wait until the Ops Manager Director is successfully installed. 
+
+<p class='note'><strong>Note</strong>: If you have existing VMs in the VPC you will recieve errors that IP addresses are already in use.</p>
+
+## <a id='examine-example'></a>Step 3: Download and Examine the Example Product Tile
+
+We will learn how to build an product tile by examining its contents.
+
+1. Download the latest release of the [Example Product Tile](https://github.com/pivotal-cf-experimental/ops-manager-example/releases).
+
+1. Change the extension from `.pivotal` to `.zip` and unzip the file on your local workstation.
+
+Study the files contained in the following directories using these explanations as a guide. Once you have looked at the files, we will deploy the tile, SSH into the Ops Manager, and explore how the tile functions.
+<ul>
+    <li>Content_migrations <strong>(optional)</strong>: Migrations for when an earlier version is upgraded.</li>
+    <li>Metadata <strong>(required)</strong>: This directory includes a product template, which is how a product is rendered in Ops Manager, and instructions for how its BOSH manifest is generated.</li>
+    <li>Releases <strong>(optional)</strong>: BOSH releases that contain the source code for a product. In this case, the release contains the NGINX webserver. </li>
+</ul>
+
+## <a id='build-your-own'></a>Step 4: Build your own Product Tile
+
+Create your own product tile by following these high level instructions. Each instruction represents hours of work in which can refer to reference documentation for help.
+
+1. Build and create a BOSH release. Information about how to build a release is found in the [BOSH documentation](https://bosh.io/). You can ask questions of the BOSH community using the [CF-BOSH mailing list](https://lists.cloudfoundry.org/archives/list/cf-bosh@lists.cloudfoundry.org/P) and [IRC Channel on Freenode](http://webchat.freenode.net/?channels=bosh).
+
+2. Create a Product Template by using the Example Product Tile as a model. Refer to the [Product Template Reference](./product-template-reference.html) for clarification.
+
+3. Consider adding Lifecycle Errands to both your BOSH release and your Product Template. Refer to the [BOSH documentation](https://bosh.io/) and the [Lifecycle Errands](./lifecycle-errands.html) topic for more information. Consider what errands to include in your product tile.
+
+4. Create folders according to the previous step, archive the folders into a `.zip` file and import the file into a deployed Ops Manager.
+
+5. The fastest way to make changes to your product tile is to directly SSH into the Ops Manager VM and edit the product template at `/var/tempest/workspace/default/metadata`. After making changes, refresh your browser to see the change. You can click **Apply Changes** in the PCF Ops Manager Installation Dashboard and view the resulting BOSH manifest in `/var/tempest/workspace/default/deployments`.
+
+6. You must create a migration file to migrate values in subsequent releases of your product. These files use a ruby gem known as Transmogrifier. Refer to the [Migrations](./migrations.html) section more information about building migrations.
+
+
+
+
