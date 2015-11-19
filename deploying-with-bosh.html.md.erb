@@ -49,7 +49,7 @@ First, you must prepare an environment on your IaaS. For this tutorial, complete
      "AllocationId": "eipalloc-13618976"
     }
   </pre>
-<p class="note"><strong>Note</strong>: Record the terminal display of the IP address for your BOSH instance for use in a step below.</p>
+<p class="note"><strong>Note</strong>: Record the IP address for your BOSH instance for use in a step below.</p>
 
 ## <a id='provision-bosh'></a>Step 2: Install BOSH on Your Infrastructure
 
@@ -77,7 +77,7 @@ The Example Tile Docs repository you cloned contains a BOSH manifest, `bosh.yml`
 
 ## <a id='create-manifest'></a>Step 3: Prepare the BOSH Manifest for the Release
 
-In this step, we prepare a BOSH manifest for the example product release. The BOSH instance deployed in the last step will use this manifest to deploy the example product. When [deploying a product tile with Ops Manager](./deploying-with-ops-man-tile.html), Ops Manager generates a manifest like this using a template we provide. However, using a manifest we create manually to deploy without Ops Manager allows us to confirm that the software release is composed properly, as well as gives us an opportunity to understand what goes into a BOSH manifest.
+In this step you prepare a manifest for BOSH to manually deploy the example product release. Manual deployment confirms proper software release composition, and illustrates the content of a BOSH manifest. If you [deploy a product tile with Ops Manager](./deploying-with-ops-man-tile.html) Ops Manager generates a manifest from a template.
 
 1. Target your BOSH:
   <pre class='terminal'>
@@ -87,55 +87,53 @@ In this step, we prepare a BOSH manifest for the example product release. The BO
     Enter password: admin
   </pre>
 
-1. Upload your release by running:
+1. Upload your release:
   <pre class='terminal'>
     $ bosh upload release example-release-7+dev.2.tgz
-    Acting as user 'admin' on 'my-bosh'
-    Verifying release...
-    Task 29 done
-    Started        2015-07-31 00:02:27 UTC
-    Finished    2015-07-31 00:02:27 UTC
-    Duration    00:00:00
-    Release uploaded
+      Acting as user 'admin' on 'my-bosh'
+      Verifying release...
+      Task 29 done
+      Started        2015-07-31 00:02:27 UTC
+      Finished    2015-07-31 00:02:27 UTC
+      Duration    00:00:00
+      Release uploaded
   </pre>
 
-1. Upload the latest AWS Xen-HVM Light stemcell to your BOSH by running:
+1. Upload the latest AWS Xen-HVM Light stemcell to your BOSH:
   <pre class='terminal'>
-    $ bosh upload stemcell https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go_agent?v=3026
-    Acting as user 'admin' on 'my-bosh'
-    Using remote stemcell `https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go_agent?v=3026'
-    Director task 15
-    Started update stemcell
-    Started update stemcell > Downloading remote stemcell. Done (00:00:02)
-    Started update stemcell > Extracting stemcell archive. Done (00:00:00)
-    Started update stemcell > Verifying stemcell manifest. Done (00:00:00)
-    Started update stemcell
-    Done update stemcell (00:00:11)
-    Task 15 done
-    Started   2015-07-30 21:23:09 UTC
-    Finished  2015-07-30 21:23:20 UTC
-    Duration  00:00:11
-    Stemcell uploaded and created.
+    $ bosh upload stemcell https:<span>/</span>/bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go\_agent?v=3026
+      Acting as user 'admin' on 'my-bosh'
+      Using remote stemcell `https:<span>/</span>/bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go_agent?v=3026'
+      Director task 15
+      Started update stemcell
+      Started update stemcell > Downloading remote stemcell. Done (00:00:02)
+      Started update stemcell > Extracting stemcell archive. Done (00:00:00)
+      Started update stemcell > Verifying stemcell manifest. Done (00:00:00)
+      Started update stemcell
+      Done update stemcell (00:00:11)
+      Task 15 done
+      Started   2015-07-30 21:23:09 UTC
+      Finished  2015-07-30 21:23:20 UTC
+      Duration  00:00:11
+      Stemcell uploaded and created.
   </pre>
 
-1. Get your BOSH Director (BOSH) **UUID** by running the following command. You will need to enter this ID in the BOSH manifest in the next step.
+1. Determine your BOSH Director (BOSH) **UUID** for input in the BOSH manifest in the following step:
   <pre class='terminal'>
     $ bosh status
-    Config
-      /Users/d/.bosh_config
-    Director
-      Name       my-bosh
-      URL        https://52.8.50.119:25555
-      Version    1.3012.0 (00000000)
-      User       admin
-      UUID       729452b0-2c1f-4763-a6ec-cf43e7f0ba89
+      Config
+        /Users/d/.bosh_config
+      Director
+        Name       my-bosh
+        URL        https:/<span>/</span>52.8.50.119:25555
+        Version    1.3012.0 (00000000)
+        User       admin
+        UUID       729452b0-2c1f-4763-a6ec-cf43e7f0ba89
   </pre>
 
-1. Open `example-release.yml`. This is the BOSH manifest file for the example release. The BOSH you deployed previously will use this manifest to deploy the example product.
+1. Open the BOSH manifest file for the `example-release.yml`. Follow the commented instructions to fill in the details specific to your BOSH deployment. BOSH requires this manifest to deploy the example product.
 
-1. In `example-release.yml`, follow the instructions in comments to fill in the details specific to your BOSH deployment.
-
-1. Run the following command to set the deployment.
+1. Set the deployment:
   <pre class='terminal'>
     $ bosh deployment ./example-release.yml
   </pre>
@@ -143,47 +141,51 @@ In this step, we prepare a BOSH manifest for the example product release. The BO
 1. Deploy the example release:
   <pre class='terminal'>
    $ bosh deploy
-   Acting as user 'admin'
-   Are you sure you want to deploy? (type 'yes' to continue): yes
-   Task 31 done
-   Started     2015-07-31 00:04:19 UTC
-   Finished    2015-07-31 00:12:52 UTC
-   Duration    00:08:33<br>
-   Deployed `example-product-906ec4aecbec172c9706' to `my-bosh'
+       Acting as user 'admin'
+       Are you sure you want to deploy? (type 'yes' to continue): yes
+       Task 31 done
+       Started     2015-07-31 00:04:19 UTC
+       Finished    2015-07-31 00:12:52 UTC
+       Duration    00:08:33<br>
+       Deployed `example-product-906ec4aecbec172c9706' to `my-bosh'
   </pre>
 
 ## <a id='confirm-deployment'></a>Step 4: Confirm Successful Deployment
 
-1. Confirm that the webserver VM is running:
+1. Confirm the `running` state of the webserver VM:
   <pre class='terminal'>
     $ bosh vms
-    Acting as user 'admin' on 'my-bosh'
-    Deployment `example-product-906ec4aecbec172c9706'
-    Director task 32
-    Task 32 done
-    +--------------+---------+---------------+-----------+
-    | Job/index    | State   | Resource Pool | IPs       |
-    +--------------+---------+---------------+-----------+
-    | web_server/0 | running | vms           | 10.0.16.5 |
-    +--------------+---------+---------------+-----------+
+      Acting as user 'admin' on 'my-bosh'
+      Deployment `example-product-906ec4aecbec172c9706'
+      Director task 32
+      Task 32 done
+      +--------------+---------+---------------+-----------+
+      | Job/index    | State   | Resource Pool | IPs       |
+      +--------------+---------+---------------+-----------+
+      | web_server/0 | running | vms           | 10.0.16.5 |
+      +--------------+---------+---------------+-----------+
   </pre>
 
-1. SSH into your VPC using the IP that you [allocated](#prep-environment) and the key pair that you [created](#prep-environment).
+1. Add the key pair to `ssh` that you recorded from the Elastic IP allocation:
   <pre class='terminal'>
     $ ssh-add MyKeyPair.pem
-    Identity added: MyKeyPair.pem (MyKeyPair.pem)
-    $ ssh ubuntu@BOSH-IP-ADDRESS
-    Welcome to Ubuntu 14.04.2 LTS (GNU/Linux 3.13.0-59-generic x86_64)
+      Identity added: MyKeyPair.pem (MyKeyPair.pem)
   </pre>
 
-1. To confirm successful deployment, view the 'hello world' page served by the webserver in the example product.
+1. SSH into your VPC using the Elastic IP address you previously allocated for your BOSH:
+    <pre class="terminal">
+    $ ssh ubuntu@BOSH-IP-ADDRESS
+      Welcome to Ubuntu 14.04.2 LTS (GNU/Linux 3.13.0-59-generic x86_64)
+  </pre>
+
+1. `curl` the `Hello World` page served by the webserver in the example product to confirm successful deployment.
   <pre class='terminal'>
     $ curl 10.0.16.5
-    &lt;html&gt;
-     &lt;body&gt;
-       &lt;h1&gt;Hello World&lt;/h1&gt;
-     &lt;/body&gt;
-    &lt;/html&gt;
+      &lt;html&gt;
+       &lt;body&gt;
+         &lt;h1&gt;Hello World&lt;/h1&gt;
+       &lt;/body&gt;
+      &lt;/html&gt;
   </pre>
 
 ## <a id='cleanup-vpc'></a>Step 5: Terminate VMs
