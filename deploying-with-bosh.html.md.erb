@@ -40,7 +40,7 @@ First, you must prepare an environment on your IaaS. For this tutorial, complete
     --capabilities CAPABILITY_IAM
   </pre>
 
-1. Allocate an Elastic IP for your BOSH instance by running the following command. The terminal displays the IP address for your BOSH instance. Record this IP address for use in a step below.
+1. Allocate an Elastic IP for your BOSH instance by running the following command. 
   <pre class='terminal'>
     $ aws ec2 allocate-address --domain vpc
     {
@@ -49,19 +49,20 @@ First, you must prepare an environment on your IaaS. For this tutorial, complete
      "AllocationId": "eipalloc-13618976"
     }
   </pre>
+<p class="note"><strong>Note</strong>: Record the terminal display of the IP address for your BOSH instance for use in a step below.</p>
 
-## <a id='provision-bosh'></a>Step 2: Install a BOSH on Your IaaS
+## <a id='provision-bosh'></a>Step 2: Install BOSH on Your Infrastructure
 
-Complete the following procedure to install a BOSH on your IaaS. You use this BOSH to deploy the example release.
+Complete the following procedure to install BOSH on your infrastructure. You deploy the example release with this instance of BOSH.
 See [Intializing an environment](http://bosh.io/docs/init.html) to learn about deploying BOSH.
 
-The Example Tile Docs repo you cloned in the previous step contains a BOSH manifest, `bosh.yml`, for the BOSH we will use to deploy the example release.
+The Example Tile Docs repository you cloned contains a BOSH manifest, `bosh.yml`, which you will use to deploy the example release.
 
 1. `cd` into `example-tile-docs-resources`.
 
 1. Open `bosh.yml`. This is the BOSH manifest file for the BOSH you will use to deploy the example release.
 
-1. In `bosh.yml`, follow the instructions in comments to fill in the details specific to your own AWS account.
+1. In `bosh.yml`, follow the instructions in the comments to fill in the specific details to your own AWS account.
 
 1. Run the following command to deploy your BOSH instance:
 
