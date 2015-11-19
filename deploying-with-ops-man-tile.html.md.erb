@@ -89,41 +89,38 @@ Download Ops Manager from [Pivotal Network](http://network.pivotal.io). Launch t
 
 1. Choose the network you created and click **Save**.
 
-1. Click **Apply Changes** and wait until the Ops Manager Director is successfully installed. 
+1. Click **Apply Changes** for Ops Manager Director to install. 
 
-<p class='note'><strong>Note</strong>: If you have existing VMs in the VPC you will recieve errors that IP addresses are already in use.</p>
+<p class='note'><strong>Note</strong>: If you have existing VMs in the VPC you can safely ignore errors that IP addresses are already in use.</p>
 
 ## <a id='examine-example'></a>Step 3: Download and Examine the Example Product Tile
 
-We will learn how to build an product tile by examining its contents.
+This step describes how you can build a product tile by examining its contents.
 
 1. Download the latest release of the [Example Product Tile](https://github.com/pivotal-cf-experimental/ops-manager-example/releases).
 
-1. Change the extension from `.pivotal` to `.zip` and unzip the file on your local workstation.
+1. Change the file extension from `.pivotal` to `.zip` and unzip the file on your local workstation.
 
-Study the files contained in the following directories using these explanations as a guide. Once you have looked at the files, we will deploy the tile, SSH into the Ops Manager, and explore how the tile functions.
-<ul>
-    <li>Content_migrations <strong>(optional)</strong>: Migrations for when an earlier version is upgraded.</li>
-    <li>Metadata <strong>(required)</strong>: This directory includes a product template, which is how a product is rendered in Ops Manager, and instructions for how its BOSH manifest is generated.</li>
-    <li>Releases <strong>(optional)</strong>: BOSH releases that contain the source code for a product. In this case, the release contains the NGINX webserver. </li>
-</ul>
+1. Study the files contained in the following directories using these explanations as a guide:
+
+    1. Content_migrations <strong>(optional)</strong>: Upgrading versions require migrations.
+
+    1. Metadata <strong>(required)</strong>: This directory includes a product template which renders in Ops Manager, and instructions for how the correlated BOSH manifest is generated.
+
+    1. Releases <strong>(optional)</strong>: This directory contains BOSH releases with the source code for a product. In this case, the release contains the NGINX webserver. 
 
 ## <a id='build-your-own'></a>Step 4: Build your own Product Tile
 
-Create your own product tile by following these high level instructions. Each instruction represents hours of work in which can refer to reference documentation for help.
+Create your own product tile by following the steps in these high level instructions. Each instruction represents substantial work with reference documentation for help.
 
-1. Build and create a BOSH release. Information about how to build a release is found in the [BOSH documentation](https://bosh.io/). You can ask questions of the BOSH community using the [CF-BOSH mailing list](https://lists.cloudfoundry.org/archives/list/cf-bosh@lists.cloudfoundry.org/P) and [IRC Channel on Freenode](http://webchat.freenode.net/?channels=bosh).
+1. Build and create a BOSH release. The [BOSH documentation](https://bosh.io/) contains information about how to build a release. You can post questions to the BOSH community using the [CF-BOSH mailing list](https://lists.cloudfoundry.org/archives/list/cf-bosh@lists.cloudfoundry.org/P) and [IRC Channel on Freenode](http://webchat.freenode.net/?channels=bosh).
 
-2. Create a Product Template by using the Example Product Tile as a model. Refer to the [Product Template Reference](./product-template-reference.html) for clarification.
+2. Create a Product Template by using the Example Product Tile as a model. Refer to the [Product Template Reference](./product-template-reference.html) for further clarification.
 
-3. Consider adding Lifecycle Errands to both your BOSH release and your Product Template. Refer to the [BOSH documentation](https://bosh.io/) and the [Lifecycle Errands](./lifecycle-errands.html) topic for more information. Consider what errands to include in your product tile.
+3. You may consider adding Lifecycle Errands to both your BOSH release and your Product Template. Refer to the [BOSH documentation](https://bosh.io/) and the [Lifecycle Errands](./lifecycle-errands.html) topic for more information.
 
-4. Create folders according to the previous step, archive the folders into a `.zip` file and import the file into a deployed Ops Manager.
+4. Create directory structure for your product folders, guided by the contents of the [Example Product Tile](https://github.com/pivotal-cf-experimental/ops-manager-example/releases), as described above. Archive the folders into a `.zip` file and import the file into a deployed Ops Manager. 
 
-5. The fastest way to make changes to your product tile is to directly SSH into the Ops Manager VM and edit the product template at `/var/tempest/workspace/default/metadata`. After making changes, refresh your browser to see the change. You can click **Apply Changes** in the PCF Ops Manager Installation Dashboard and view the resulting BOSH manifest in `/var/tempest/workspace/default/deployments`.
+5. SSH into the Ops Manager VM and edit the product template at `/var/tempest/workspace/default/metadata` to directly make changes to your product tile. After making changes, refresh your browser to see the changes. You can click **Apply Changes** in the PCF Ops Manager Installation Dashboard and view the resulting BOSH manifest in `/var/tempest/workspace/default/deployments`.
 
-6. You must create a migration file to migrate values in subsequent releases of your product. These files use a ruby gem known as Transmogrifier. Refer to the [Migrations](./migrations.html) section more information about building migrations.
-
-
-
-
+6. You must create a migration file to migrate values in subsequent releases of your product. These files use a Ruby gem known as `Transmogrifier`. Refer to the [Migrations](./migrations.html) section more information about building migrations.
