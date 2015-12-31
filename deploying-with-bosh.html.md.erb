@@ -3,44 +3,45 @@ title: Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH
 ---
 <p class='note'><strong>Note</strong>: This topic is part of the <a href='./creating.html'>Creating a Pivotal Cloud Foundry® Product Tile</a> tutorial.  Before beginning this procedure, you should confirm that you meet the <a href='./creating.html#prereqs'>tutorial prerequisites</a>.</p>
 
-BOSH is the Cloud Foundry orchestration tool for installing and managing software and virtual machines. A product release should install successfully using BOSH before it can be crafted into an Ops Manager tile.
+BOSH is the Cloud Foundry orchestration tool for installing and managing software and virtual machines. A product should install successfully using BOSH before it can be crafted into an Ops Manager tile.
 
-Refer to the [BOSH documentation](https://bosh.io/) for more information about how to create a BOSH release of your own.
+A software product that BOSH installs is called a <i>BOSH release</i>. This topic leads you through the process of deploying an example BOSH release, an [Nginx](http://nginx.org/) webserver that serves a "Hello, World" page, onto Amazon Web Services.
 
-This topic leads you through the process of deploying an example BOSH release consisting of an [Nginx](http://nginx.org/) webserver.
+Refer to the [BOSH documentation](https://bosh.io/) for more information about how to create your own BOSH release.
 
 ## <a id='prep-environment'></a>Step 1: Prepare an Environment
 
-First, you must prepare an environment on your IaaS. For this tutorial, complete the following procedure to prepare an environment on Amazon Web Services (AWS). The steps differ slightly for other infrastructures, such as vSphere or OpenStack.
+First, you must prepare an environment on your IaaS. This procedure prepares an environment on Amazon Web Services (AWS). The steps differ slightly for other infrastructures, such as vSphere or OpenStack.
 
-1. Run the following command to clone the Example Tile Docs Resources git repository.
+1. Open a terminal window and `cd` into the directory you want to work in. From a browser, log into your AWS account. In the following steps you will enter commands into the terminal window, and you can track the results through your browser from your AWS account's EC2 (Elastic Compute Cloud) and VPC (Virtual Private Cloud) dashboards.
+
+1. Run `git clone` to make a local copy of the <i>example-tile-docs-resources</i> git repository. This repo contains the BOSH release and configuration files used in this tutorial.
   <pre class='terminal'>
     $ git clone git<span>@</span>github.com:pivotal-cf-experimental/example-tile-docs-resources.git
   </pre>
 
 1. `cd` into the cloned directory:
   <pre class='terminal'>
-    $ cd EXAMPLE-TILE-DOCS-RESOURCES
+    $ cd example-tile-docs-resources
   </pre>
 
-1. Create a key pair for your AWS Virtual Machines and pipe it to a local file named MyKeyPair.pem:
+1. Create a cryptography key pair called ExampleKeyPair for AWS EC2 and pipe it to a local file named <i>ExampleKeyPair.pem</i>:
   <pre class='terminal'>
-    $ aws ec2 create-key-pair --key-name MYKEYPAIR \
-    | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["KeyMaterial"]' \
-    \> MYKEYPAIR.pem
+    aws ec2 create-key-pair --key-name ExampleKeyPair --query 'KeyMaterial' \
+    --output text > ExampleKeyPair.pem
   </pre>
+ You should now see ExampleKeyPair in your EC2 Dashboard under "Key Pairs." If needed, you can undo this step with `aws ec2 delete-key-pair --key-name ExampleKeyPair` and `rm ExampleKeyPair.pem`
 
-1. Provision your AWS account with the resources specified in the template:
+1. Use the `aws cloudformation` command to create the small private cloud <i>ExampleStack</i>, by provisioning your AWS account with the resources specified in the file <i>cloudformation.json</i>:
   <pre class='terminal'>
-    $ aws cloudformation create-stack \
-    --stack-name examplestack \
+    $ aws cloudformation create-stack --stack-name ExampleStack \
     --template-body file://cloudformation.json \
-    --parameters \
-    ParameterKey=KeyName,ParameterValue=MyKeyPair  \
+    --parameters ParameterKey=KeyName,ParameterValue=ExampleKeyPair  \
     --capabilities CAPABILITY_IAM
   </pre>
+  You should now see ExampleStack in your VPC Dashboard under "Your VPCs," along with an associated Subnet, Security Group, and Network Interface. If needed, you can undo this step with `aws cloudformation delete-stack --stack-name ExampleStack`
 
-1. Allocate an Elastic IP for your BOSH instance by running the following command. 
+1. Allocate an IP address for your BOSH instance by running the following command:
   <pre class='terminal'>
     $ aws ec2 allocate-address --domain vpc
     {
@@ -49,20 +50,19 @@ First, you must prepare an environment on your IaaS. For this tutorial, complete
      "AllocationId": "eipalloc-13618976"
     }
   </pre>
-<p class="note"><strong>Note</strong>: Record the IP address for your BOSH instance for use in a step below.</p>
+<p class="note"><strong>Note</strong>: Record the public IP address returned by this command for use in steps below.</p>
 
 ## <a id='provision-bosh'></a>Step 2: Install BOSH on Your Infrastructure
 
-Complete the following procedure to install BOSH on your infrastructure. You deploy the example release with this instance of BOSH.
+Complete this procedure to install an instance of BOSH on your infrastructure, following the example manifest file <i>bosh.yml</i>.
 See [Intializing an environment](http://bosh.io/docs/init.html) to learn about deploying BOSH.
 
-The Example Tile Docs repository you cloned contains a BOSH manifest, `bosh.yml`, which you will use to deploy the example release.
-
-1. `cd` into `example-tile-docs-resources`.
-
-1. Open `bosh.yml`. This is the BOSH manifest file for the BOSH you will use to deploy the example release.
-
-1. In `bosh.yml`, follow the instructions in the comments to fill in the specific details to your own AWS account.
+1. In the <i>example-tile-docs-resources</i> directory, open the file <i>bosh.yml</i> in an editor. Follow the instructions in the comments to fill in details specific to your own AWS account:
+  * Elastic IP: From `aws ec2 allocate-address`, above
+  * Subnet: In VPC Dashboard / Subnets, Subnet ID for the subnet in the VPC associated with ExampleStack
+  * Availability Zone: Availability Zone listed for the subnet above
+  * Security Group: In EC2 Dashboard / Security Groups, Group Name for group associated with ExampleStack
+  * AWS Access Key ID and Secret Access Key: In local file <i>~/.aws/credentials</i>
 
 1. Run the following command to deploy your BOSH instance:
 
@@ -118,7 +118,7 @@ In this step you prepare a manifest for BOSH to manually deploy the example prod
       Stemcell uploaded and created.
   </pre>
 
-1. Determine your BOSH Director (BOSH) **UUID** for input in the BOSH manifest in the following step:
+1. Use `bosh status` to determine your BOSH Director (BOSH) **UUID** for the example release's BOSH manifest:
   <pre class='terminal'>
     $ bosh status
       Config

@@ -1,28 +1,35 @@
 ---
-title: Creating a Pivotal Cloud Foundry&reg; Product Tile
+title: Tutorial&#58; Creating a Pivotal Cloud Foundry&reg; Product Tile
 ---
 
 Installed software products appear in the [Pivotal Cloud Foundry&reg;](https://network.pivotal.io/products/pivotal-cf) (PCF)
-Ops Manager Installation Dashboard as tiles. This tutorial describes the procedure for creating a product tile for use in Ops Manager.
+Ops Manager Installation Dashboard as clickable tiles, for easy installation. This tutorial explains how to create your own product tile for use in Ops Manager.
 
 <%= image_tag 'tiles.png' %>
 
 ## <a id='prereqs'></a>Prerequisites
 
-To complete this tutorial, you will need the following:
+To complete this tutorial, you will need:
 
-- An Amazon Web Services (AWS) account with Virtual Private Cloud (VPC).
+- An [Amazon Web Services](http://aws.amazon.com) (AWS) account with Virtual Private Cloud (VPC).
+
 - The [AWS CLI](https://aws.amazon.com/cli/) installed on your machine.
-- Basic familiarity with [BOSH](https://bosh.io/).
-- The [BOSH CLI](https://bosh.io/docs/bosh-cli.html) installed on your machine.
 
-## <a id='procs'></a>Procedures
-Ops Manager automates the BOSH deployment of software products, but introduces additional complexity as well. As a tile author, you should first confirm that your product successfully deploys with BOSH before attempting to deploy it with Ops Manager.
+<p class='note'><strong>Note</strong>: If you have trouble installing the AWS CLI on Linux, OS X, or Unix using pip or the bundled installer, as described the AWS CLI [User Guide](http://http://docs.aws.amazon.com/cli/latest/userguide/installing.html), try installing the awscli package using [Homebrew](http://brew.sh/).
 
-1. [Deploying A PCF Product Using BOSH](./deploying-with-bosh.html) describes the procedure for deploying a release of your software product with BOSH. Confirm that this is successful before proceeding to deploy with Ops Manager.
+- Basic familiarity with [BOSH](https://bosh.io/), a tool that deploys and manages distributed software systems.
 
-1. [Deploying Your Product as a Tile in Ops Manager](./deploying-with-ops-man-tile.html) describes the procedure for creating a tile for your product and deploying to Ops Manager.
+- The [BOSH CLI](https://bosh.io/docs/bosh-cli.html) and [bosh-init](https://bosh.io/docs/install-bosh-init.html) installed on your machine.
+
+## <a id='procs'></a>Overview: BOSH and Ops Manager
+Ops Manager is a graphical front-end to BOSH. When you use Ops Manager to deploy a software product, Ops Manager directs BOSH to run the deployment on the back end.
+
+Because Ops Manager adds an additional layer of complexity to the deployment process, tile authors should first confirm that their product deploys successfully with BOSH alone. Once their BOSH deployment works, the authors can then add the necessary pieces to turn their product into a click-deployable tile for Ops Manager. This tutorial follows these two steps:
+
+1. [Deploying A PCF Product Using BOSH](./deploying-with-bosh.html) describes how to deploy a software product with BOSH, step by step, using a simple example. You should confirm that a BOSH deployment succeeds with your product before you try to deploy it via Ops Manager.
+
+1. [Deploying Your Product as a Tile in Ops Manager](./deploying-with-ops-man-tile.html) explains how to create a tile that packages your product and deploys it through Ops Manager.
 
 ## <a id='ref-docs'></a>Reference Documentation
 
-[Product Template Reference](./product-template-reference.html) provides explanations for the BOSH manifest key-value pairs that are required for an Ops Manager product template.
+Ops Manager product tiles generate a BOSH manifest, the document that configures and directs the product's deployment. The [Product Template Reference](./product-template-reference.html) explains the key-value pairs that this BOSH manifest must contain.
