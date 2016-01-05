@@ -13,7 +13,7 @@ Refer to the [BOSH documentation](https://bosh.io/) for more information about h
 
 First, you must prepare an environment on your IaaS. This procedure prepares an environment on Amazon Web Services (AWS). The steps differ slightly for other infrastructures, such as vSphere or OpenStack.
 
-1. Open a terminal window and `cd` into the directory you want to work in. From a browser, log into your AWS account. In the following steps you will enter commands into the terminal window, and you can track the results through your browser from your AWS account's EC2 (Elastic Compute Cloud) and VPC (Virtual Private Cloud) dashboards.
+1. Open a terminal window and `cd` into the directory you want to work in. From a browser, log into your AWS account. In the following steps you will enter terminal commands and track the results through your browser from your AWS account's EC2 (Elastic Compute Cloud) and VPC (Virtual Private Cloud) dashboards.
 
 1. Run `git clone` to make a local copy of the <i>example-tile-docs-resources</i> git repository. This repo contains the BOSH release and configuration files used in this tutorial.
   <pre class='terminal'>
@@ -30,7 +30,7 @@ First, you must prepare an environment on your IaaS. This procedure prepares an 
     aws ec2 create-key-pair --key-name ExampleKeyPair --query 'KeyMaterial' \
     --output text > ExampleKeyPair.pem
   </pre>
- You should now see ExampleKeyPair in your EC2 Dashboard under "Key Pairs." If needed, you can undo this step with `aws ec2 delete-key-pair --key-name ExampleKeyPair` and `rm ExampleKeyPair.pem`
+ You should now see ExampleKeyPair in your EC2 Dashboard under "Key Pairs" and have <i>~/.aws/config</i> and <i>~/.aws/credentials</i> files in your home directory. If needed, you can undo this step with `aws ec2 delete-key-pair --key-name ExampleKeyPair` and `rm ExampleKeyPair.pem`
 
 1. Use the `aws cloudformation` command to create the small private cloud <i>ExampleStack</i>, by provisioning your AWS account with the resources specified in the file <i>cloudformation.json</i>:
   <pre class='terminal'>
@@ -181,7 +181,7 @@ To undo this step, run `bosh deployments`, copy the deployment name, and run `bo
       Identity added: ExampleKeyPair.pem (ExampleKeyPair.pem)
   </pre>
 
-1. `ssh` into your VPC as vcap@BOSH-IP-ADDRESS using the public Elastic IP address you allocated for BOSH, and confirm:
+1. `ssh` into your VPC as vcap@BOSH-IP-ADDRESS, using the public Elastic IP address you allocated for BOSH, and confirm:
   <pre class='terminal'>
     $ ssh vcap@52.8.71.6
     Are you sure you want to continue connecting (yes/no)? yes
@@ -201,4 +201,5 @@ To undo this step, run `bosh deployments`, copy the deployment name, and run `bo
 
 ## <a id='cleanup-vpc'></a>Step 5: Terminate VMs
 
-Use the AWS EC2 Dashboard to terminate the instances in your VPC before proceeding to [Deploying Your Product as a Tile](./deploying-with-ops-man-tile.html). See [the AWS documentation on terminating instances](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html).
+Use the EC2 Dashboard to terminate the webserver instance from your VPC before proceeding to [Deploying Your Product as a Tile](./deploying-with-ops-man-tile.html). Leave the BOSH and NAT instances running> See [the AWS documentation on terminating instances](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html).
+
