@@ -10,47 +10,15 @@ This topic describes the installation and product template YAML files in your Pi
 
 During the installation process, Ops Manager combines information from the installation and product template YAML files to generate the manifests that define your deployment.
 
-**Installation files**: PCF stores user-entered data and automatically generated values for Ops Manager in installation files. PCF encrypts and stores these files in the following IaaS-specific directory:
-
-  * **AWS**:`/var/ubuntu/workspaces/default`
-  * **VMWare IaaS Product**:`/var/tempest/workspaces/default`
+**Installation files**: PCF stores user-entered data and automatically generated values for Ops Manager in installation files. PCF encrypts and stores these files in the directory `/var/tempest/workspaces/default`.
 
 You must decrypt them to view the contents, edit the files as necessary for your content migration, then re-encrypt them.
 
-**Product templates**: Ops Manager uses product templates to create forms and obtain user input. The `job_types` and `property_blueprint` key-value pairs in a product template determine how the `jobs` and `properties` sections display in the installation file. Ops Manager stores product templates in the following IaaS-specific directory:
-
-  * **AWS**:`/var/ubuntu/meta-data`
-  * **VMWare IaaS Product**:`/var/tempest/workspaces/default/metadata`
+**Product templates**: Ops Manager uses product templates to create forms and obtain user input. The `job_types` and `property_blueprint` key-value pairs in a product template determine how the `jobs` and `properties` sections display in the installation file. Ops Manager stores product templates in the directory `/var/tempest/workspaces/default/metadata`.
 
 You can edit these files. User input does not alter these files.
 
 ##<a id='decrypt-encrypt'></a> Decrypting and Encrypting Installation Files ##
-
-1. Clone the GitHub `pivotal-cf encrypt-decrypt scripts` repo:
-
-    <pre class="terminal">
-    git clone https://github.com/pivotal-cf/encrypt-decrypt-scripts
-    </pre>
-
-    This repo contains the following files:
-    * `decrypt-ops.sh`
-    * `encrypt-ops.sh`
-    * `eos.rb`
-
-1. Copy the files from your local machine to your Ops Manager VM.
-
-    Replace `LOCAL_USER@LOCAL_SERVER` with the username and the IP address of your machine.
-
-    Use the correct `REMOTE_USER` name for your IaaS, as follows:
-    * **AWS**: `ubuntu`
-    * **VMWare IaaS Product**: `tempest`
-
-    <pre class="terminal">
-    $ ssh LOCAL_USER@LOCAL_SERVER
-    $ scp ~/PATH_TO_FILES/*.sh REMOTE_USER@REMOTE_SERVER:/home/REMOTE_USER
-    $ scp ~/PATH_TO_FILES/eos.rb REMOTE_USER@REMOTE_SERVER:/home/REMOTE_USER
-    </pre>
-
 
 1. Log in to the Ops Manager VM using SSH and the correct username for your IaaS.
 
@@ -69,31 +37,52 @@ You can edit these files. User input does not alter these files.
     tempest@REMOTE_SERVER's password:
     </pre>
 
-1. Use `sudo cp` to copy the files to the protected `/var/REMOTE_USER/workspaces/default` directory.
+1. `cd` into the directory `/var/tempest/workspace/default/metadata` on the Ops Manager VM.
 
     <pre class="terminal">
-    $ sudo cp *.sh /var/REMOTE_USER/workspaces/default
-    $ sudo cp eos.rb /var/REMOTE_USER/workspaces/default
+    $ cd /var/tempest/workspace/default/metadata`
     </pre>
 
-1. In the `/var/REMOTE_USER/workspaces/default` directory, change the permissions of the `decrypt-ops.sh` and `encrypt-ops.sh` scripts.
+1. Clone the encryption/decryption script files from the GitHub `pivotal-cf encrypt-decrypt scripts` repository:
 
+    <pre class="terminal">
+    sudo git clone https://github.com/pivotal-cf/encrypt-decrypt-scripts
+    </pre>
 
+    This repo contains the following files:
+    * `decrypt-ops.sh`
+    * `encrypt-ops.sh`
+    * `eos.rb`
+
+1. Use `sudo cp` to copy the files to the protected `/var/tempest/workspaces/default` parent directory.
+
+    <pre class="terminal">
+    $ sudo cp *.sh ..
+    $ sudo cp eos.rb /..
+    </pre>
+
+1. `cd` up to the `/var/tempest/workspaces/default` directory.
+
+    <pre class="terminal">
+    $ cd ..
+    </pre>
+
+1. Change the permissions of the `decrypt-ops.sh` and `encrypt-ops.sh` scripts.
     <pre class="terminal">
     $ sudo chmod 755 decrypt.sh
     $ sudo chmod 755 encrypt.sh
     </pre>
 
-1. In the `/var/REMOTE_USER/workspaces/default` directory, run the `decrypt` command to create the `decrypted-installation.yml` and `decrypted-installed.yml` files.
+1. Run the `decrypt` command to create the `decrypted-installation.yml` and `decrypted-installed.yml` files.
 
-    Replace `PASSWORD` with your Ops Manager `REMOTE_USER` UserID password.
+    Replace `PASSWORD` with your Ops Manager UserID password.
 
     <pre class="terminal">
     $ sudo ./decrypt.sh PASSWORD
     </pre>
 
     This script does the following:
-     * Searches the `/var/REMOTE_USER/workspaces/default` for the installation YAML files and creates decrypted copies.
+     * Searches the `/var/tempest/workspaces/default` for the installation YAML files and creates decrypted copies.
      * Creates a directory `decrypted` and stores the decrypted files in this directory.
 
 
@@ -102,13 +91,13 @@ You can edit these files. User input does not alter these files.
 
 1. Run the `encrypt` command on the modified decrypted files.
 
-    Replace `PASSWORD` with your Ops Manager `REMOTE_USER` UserID password.
+    Replace `PASSWORD` with your Ops Manager UserID password.
 
     <pre class="terminal">
     $ sudo ./encrypt.sh PASSWORD
     </pre>
 
-    This script encrypts the decrypted files and stores the resulting output in the `/var/REMOTE_USER/workspaces/default` directory, which overwrites the existing `installation.yml` file and adds a new file, `installed-installation.yml`. `encrypt-ops.sh` does not overwrite the `actual-installation.yml` file.
+    This script encrypts the decrypted files and stores the resulting output in the `/var/tempest/workspaces/default` directory, which overwrites the existing `installation.yml` file and adds a new file, `installed-installation.yml`. `encrypt-ops.sh` does not overwrite the `actual-installation.yml` file.
 
     <p class='note'><strong>Note</strong>: Ensure that you back up the edited and encrypted <code>installation.yml</code> and <code>installed-installation.yml</code> files for future reference.</p>
 

@@ -2,47 +2,28 @@
 title: Understanding Lifecycle Errands
 ---
 
-Lifecycle errands are BOSH Errands (scripts) that run at designated points in time during a product installation. Product teams create errands as part of a product package,and a product can only run errands it includes. Refer to [BOSH documentation](https://bosh.io/) for more information about BOSH Errands
+Lifecycle errands are BOSH Errands (scripts) that run at the beginning and end of an installed product's availability time. Product teams create errands as part of a product package, and a product can only run errands it includes. Refer to [BOSH documentation](https://bosh.io/) for more information about BOSH Errands
 
-Products can have two kinds of lifecycle errands:
+Products can have two kinds of lifecycle errands. <i>Post-install</i> errands run after a product installs but before Ops Manager displays makes it available for use. <i>Pre-delete</i> errands run after an operator chooses to delete a product, but before Ops Manager finishes removing it from use. Post-install errands can be skipped during product installation, but pre-delete errands run always.
 
-<a id='post-install'>**Post-Install**</a>: Post-install errands run after a
-product installs, before Ops Manager makes the product available for use.
+##<a id='post-install'></a>Post-Install Errands
 
-Most post-install errands run by default.
-An operator can prevent a post-install errand from running by deselecting the
-checkbox for the errand on the **Settings** tab of the product tile in Ops
-Manager before installing the product.
+Post-install errands run after a product installs, but before Ops Manager makes it available for use. Typical post-install errands include smoke or acceptance tests, database initialization or database migration, and service broker registration.
+
+Most post-install errands run by default, but an operator can prevent a post-install errand from running by deselecting its checkbox on the product tile's **Settings** tab before installing the product.
 
 <%= image_tag("example-errand.png") %>
 
-<br />
+For example, Pivotal MySQL has a **Broker Registrar** post-install errand that the Elastic Runtime tile uses to register its service broker with the Cloud Controller and publish its service plans.
 
-Typical post-install errands include smoke or acceptance tests, databases
-initialization or database migration, and service broker registration.
+If an operator deselects the checkbox for Elastic Runtime's **Broker Registrar** errand before installation, Elastic Runtime's service broker is not registered with the Cloud Controller, and its service plans are not made public.
 
-<a id='pre-delete'>**Pre-Delete**</a>: Pre-delete errands run after an operator
-chooses to delete a product, before Ops Manager deletes the product. Ops Manager does not display pre-delete errands, and an operator cannot prevent a pre-delete errand from running.
+##<a id='pre-delete'></a>Pre-Delete Errands
+
+Pre-delete errands run after an operator chooses to delete a product, but before Ops Manager actually finishes deleting it. Ops Manager does not display pre-delete errands, and an operator cannot prevent them from running.
 
 Typical pre-delete errands include clean up of application artifacts and service
-broker de-registration.
-
-## Post-Install Errand Example ##
-
-Pivotal MySQL has a **Broker Registrar** post-install errand.
-This errand registers the service broker with the Cloud Controller and makes
-service plans public.
-After successfully installing Elastic Runtime, but before making Elastic Runtime
-available for use, Ops Manager runs the **Broker Registrar** post-install
-errand.
-
-If an operator deselects the checkbox for the **Broker Registrar** errand before
-installing Elastic Runtime, the service broker is not registered with the Cloud
-Controller, and the service plans are not made public.
-
-## Pre-Delete Errand Example ##
-
-Pivotal MySQL has a **Broker Deregistrar** pre-delete errand. This errand:
+broker de-registration. For example, Pivotal MySQL has a **Broker Deregistrar** pre-delete errand that:
 
 * Purges the service offering
 * Purges all service instances
@@ -50,8 +31,5 @@ Pivotal MySQL has a **Broker Deregistrar** pre-delete errand. This errand:
 * Deletes the service broker from the Cloud Controller
 
 When an operator chooses to delete the Pivotal MySQL product, Ops Manager first
-runs the **Broker Deregistrar** pre-delete errand, then deletes the product.
-
-Ops Manager does not display the **Broker Deregistrar** pre-delete errand, and
-an operator cannot prevent the errand from running when Pivotal MySQL is
+runs the **Broker Deregistrar** pre-delete errand, then deletes the product. An operator cannot prevent this errand from running when Pivotal MySQL is
 deleted.
