@@ -4,7 +4,7 @@ title: Deploying Your Product as a Tile in Ops Manager
  
  <p class='note'><strong>Note</strong>: This topic is part of the [Creating a Pivotal Cloud Foundry® Product Tile](./creating.html) tutorial.  Before beginning this procedure, you should follow the procedure described in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html).</p>
 
-This topic describes deploying a Cloud Foundry software product as a tile in [Pivotal Cloud Foundry&reg;](https://network.pivotal.io/products/pivotal-cf) (PCF) Ops Manager. Ops Manager offers a web GUI to BOSH and eases the process of deploying software with BOSH by providing the following:
+This topic describes deploying a Cloud Foundry software product as a tile in [Pivotal Cloud Foundry&reg;](https://network.pivotal.io/products/pivotal-cf) (PCF) Ops Manager. Ops Manager uses BOSH to deploy software products to the cloud, and eases the process by providing the following:
 
 - Automated error-checking
 - Automated manifest generation
@@ -61,12 +61,12 @@ Download the latest Ops Manager from a shared AMI (Amazon Machine Image) on AWS,
 <%= image_tag 'director.png' %>
 
 1. In the AWS Management Console Config / AWS Config settings, enter values from [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html): 
-  * **Access Key ID** in the BOSH manifest <i>bosh.yml</i>
-  * **AWS Secret Key** in the BOSH manifest <i>bosh.yml</i>
+  * **Access Key ID** in the BOSH manifest `bosh.yml`
+  * **AWS Secret Key** in the BOSH manifest `bosh.yml`
   * **VPC ID** from **VPC Dashboard > Your VPCs**
-  * **Security Group Name** in the BOSH manifest <i>bosh.yml</i>
+  * **Security Group Name** in the BOSH manifest `bosh.yml`
   * **Key Pair Name** "ExampleKeyPair"
-  * **SSH Private Key** copied from <i>ExampleKeyPair.pem</i> in your working directory
+  * **SSH Private Key** copied from `ExampleKeyPair.pem` in your working directory
   * **Region** "us-west-1"
 <%= image_tag 'aws-config.png' %>
 
@@ -74,7 +74,7 @@ Download the latest Ops Manager from a shared AMI (Amazon Machine Image) on AWS,
 
 1. Select **Director Config**.
 
-1. Under **NTP Servers** enter "0.amazon.pool.ntp.org" and click **Save**.
+1. Under **NTP Servers** enter `0.amazon.pool.ntp.org` and click **Save**.
 
 1. Select **Create Availability Zones**.
 
@@ -84,13 +84,13 @@ Download the latest Ops Manager from a shared AMI (Amazon Machine Image) on AWS,
 
 1. Choose the Availability Zone you just created and click **Save**.
 
-1. Select **Create Networks**. Enter the following values, some of which are re-used from the BOSH manifest <i>example-release.yml</i>, which originally deployed the app instance you terminated at the end of [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html):
+1. Select **Create Networks**. Enter the following values, some of which are re-used from the BOSH manifest `example-release.yml`, which originally deployed the app instance you terminated at the end of [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html):
   * **Name** can be anything
-  * **VPC Subnet ID** from **VPC Dashboard > Subnets**, or in the BOSH manifest <i>bosh.yml</i>
+  * **VPC Subnet ID** from **VPC Dashboard > Subnets**, or in the BOSH manifest `bosh.yml`
   * **Subnet (CIDR Range)** is the CIDR listed for your subnet under **VPC Dashboard > Subnets**
-  * **Excluded IP Ranges** the <i>reserved</i> range listed under <i>subnets</i> in <i>example-release.yml</i>
-  * **DNS** the <i>dns</i> address listed under <i>subnets</i> in <i>example-release.yml</i>
-  * **Gateway** the <i>gateway</i> address listed under <i>subnets</i> in <i>example-release.yml</i>
+  * **Excluded IP Ranges** the `reserved` range listed under `subnets` in `example-release.yml`
+  * **DNS** the `dns` address listed under `subnets` in `example-release.yml`
+  * **Gateway** the `gateway` address listed under `subnets` in `example-release.yml`
 <%= image_tag 'networks.png' %>
 
 1. Click **Save**.

@@ -15,7 +15,7 @@ First, you must prepare an environment on your IaaS. This procedure prepares an 
 
 1. Open a terminal window and `cd` into the directory you want to work in. From a browser, log into your AWS account. In the following steps you will enter terminal commands and track the results through your browser from your AWS account's EC2 (Elastic Compute Cloud) and VPC (Virtual Private Cloud) dashboards.
 
-1. Run `git clone` to make a local copy of the <i>example-tile-docs-resources</i> git repository. This repo contains the BOSH release and configuration files used in this tutorial.
+1. Run `git clone` to make a local copy of the `example-tile-docs-resources` git repository. This repo contains the BOSH release and configuration files used in this tutorial.
   <pre class='terminal'>
     $ git clone git<span>@</span>github.com:pivotal-cf-experimental/example-tile-docs-resources.git
   </pre>
@@ -25,14 +25,14 @@ First, you must prepare an environment on your IaaS. This procedure prepares an 
     $ cd example-tile-docs-resources
   </pre>
 
-1. Create a cryptography key pair called ExampleKeyPair for AWS EC2 and pipe it to a local file named <i>ExampleKeyPair.pem</i>:
+1. Create a cryptography key pair called ExampleKeyPair for AWS EC2 and pipe it to a local file named `ExampleKeyPair.pem`:
   <pre class='terminal'>
     aws ec2 create-key-pair --key-name ExampleKeyPair --query 'KeyMaterial' \
     --output text > ExampleKeyPair.pem
   </pre>
- You should now see ExampleKeyPair in your **EC2 Dashboard** under **Key Pairs** and have <i>~/.aws/config</i> and <i>~/.aws/credentials</i> files in your home directory. If needed, you can undo this step with `aws ec2 delete-key-pair --key-name ExampleKeyPair` and `rm ExampleKeyPair.pem`
+ You should now see ExampleKeyPair in your **EC2 Dashboard** under **Key Pairs** and have `~/.aws/config` and `~/.aws/credentials` files in your home directory. If needed, you can undo this step with `aws ec2 delete-key-pair --key-name ExampleKeyPair` and `rm ExampleKeyPair.pem`
 
-1. Use the `aws cloudformation` command to create the small private cloud <i>ExampleStack</i>, by provisioning your AWS account with the resources specified in the file <i>cloudformation.json</i>:
+1. Use the `aws cloudformation` command to create the small private cloud <i>ExampleStack</i>, by provisioning your AWS account with the resources specified in the file `cloudformation.json`:
   <pre class='terminal'>
     $ aws cloudformation create-stack --stack-name ExampleStack \
     --template-body file://cloudformation.json \
@@ -55,14 +55,14 @@ To undo this step, release the address under **VPC Dashboard > Elastic IPs**.
 
 ## <a id='provision-bosh'></a>Step 2: Install a BOSH Instance on Your Infrastructure
 
-This step uses the BOSH manifest file <i>bosh.yml</i> to configure and install a BOSH instance on your infrastructure. See [Initializing an environment](http://bosh.io/docs/init.html) to learn about deploying BOSH.
+This step uses the BOSH manifest file `bosh.yml` to configure and install a BOSH instance on your infrastructure. See [Initializing an environment](http://bosh.io/docs/init.html) to learn about deploying BOSH.
 
-1. In the <i>example-tile-docs-resources</i> directory, open the file <i>bosh.yml</i> in an editor. Follow the instructions in the comments to fill in details specific to your AWS account:
+1. In the `example-tile-docs-resources` directory, open the file `bosh.yml` in an editor. Follow the instructions in the comments to fill in details specific to your AWS account:
   * Elastic IP: See `aws ec2 allocate-address` above.
   * Subnet: In **VPC Dashboard > Subnets**, use the ID listed for the subnet in the VPC associated with ExampleStack.
   * Availability Zone: Use the Availability Zone listed for the subnet above.
   * Security Group: In **EC2 Dashboard > Security Groups**, use the Group Name for group associated with ExampleStack.
-  * AWS Access Key ID and Secret Access Key: This is stored in the local file <i>~/.aws/credentials</i>.
+  * AWS Access Key ID and Secret Access Key: This is stored in the local file `~/.aws/credentials`.
 
 1. Run `bosh-init` with your manifest to deploy your BOSH instance:
 
@@ -74,11 +74,11 @@ This step uses the BOSH manifest file <i>bosh.yml</i> to configure and install a
     Stopping registry... Finished (00:00:00)
     Cleaning up rendered CPI jobs... Finished (00:00:00)
   </pre>
-This command will take some time. To undo this step, terminate the VM running bosh under **EC2 Dashboard > Instances**, and delete <i>bosh-state.json</i> and <i>~/.bosh_config</i>.
+This command will take some time. To undo this step, terminate the VM running bosh under **EC2 Dashboard > Instances**, and delete `bosh-state.json` and `~/.bosh_config`.
 
 ## <a id='create-manifest'></a>Step 3: Deploy an Application on Your BOSH Instance
 
-This procedure for manual deployment uses the BOSH manifest <i>example-release.yml</i> to configure and install the tutorial's example application on your BOSH instance. Manual deployment shows the content of a BOSH manifest and confirms that it composes your BOSH release properly. If you [deploy a product tile with Ops Manager](./deploying-with-ops-man-tile.html), Ops Manager generates a manifest from a template.
+This procedure for manual deployment uses the BOSH manifest `example-release.yml` to configure and install the tutorial's example application on your BOSH instance. Manual deployment shows the content of a BOSH manifest and confirms that it composes your BOSH release properly. If you [deploy a product tile with Ops Manager](./deploying-with-ops-man-tile.html), Ops Manager generates a manifest from a template.
 
 1. Target your BOSH to the public IP address allocated above, logging in as admin / admin:
   <pre class='terminal'>
@@ -134,14 +134,14 @@ To undo this step, run `bosh deployments`, copy the stemcell name and version, a
         UUID       ea1b4d3e-bc26-4e83-b7a0-dd3b08cb7089
   </pre>
 
-1. Open the BOSH manifest file <i>example-release.yml</i> in an editor. Follow the commented instructions to fill in details specific to your BOSH deployment. You already added most of these values into <i>bosh.yml</i>.
+1. Open the BOSH manifest file `example-release.yml` in an editor. Follow the commented instructions to fill in details specific to your BOSH deployment. You already added most of these values into `bosh.yml`.
 
 1. Set the deployment to use the manifest file:
   <pre class='terminal'>
     $ bosh deployment ./example-release.yml
   </pre>
 
-1. Deploy the example release with `bosh deploy`, and confirm by typing "yes":
+1. Deploy the example release with `bosh deploy`, and confirm by typing `yes`:
   <pre class='terminal'>
    $ bosh deploy
        Acting as user 'admin'
@@ -201,5 +201,5 @@ To undo this step, run `bosh deployments`, copy the deployment name, and run `bo
 
 ## <a id='cleanup-vpc'></a>Step 5: Terminate VMs
 
-Use the **EC2 Dashboard** to terminate the webserver and BOSH instances from your VPC before proceeding to [Deploying Your Product as a Tile](./deploying-with-ops-man-tile.html). Leave the NAT instance running> See [the AWS documentation on terminating instances](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html).
+Use the **EC2 Dashboard** to terminate the webserver and BOSH instances from your VPC before proceeding to [Deploying Your Product as a Tile](./deploying-with-ops-man-tile.html). Leave the NAT instance running. For instructions on how to terminate instances from the **EC2 Dashboard** see the [AWS documentation](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html).
 
