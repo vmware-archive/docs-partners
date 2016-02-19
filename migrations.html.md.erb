@@ -2,6 +2,76 @@
 title: Migrations
 ---
 
-This document will explore how migrations are made from one version of a product to another.
+This document introduces product tile migrations based on Javascript-based syntax for updating values or property names in a metadata file. Tile migration refers to changing the name or value of a property in your product tile when a user upgrades your tile. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
+
+In addition, migrations will be “chaining,” i.e., a user upgrading from version A to C of your product tile will trigger migration A->B and then B->C.   
+
+## Requirements:
+* Ops Manager: 1.7 or higher
+* Product metadata (i.e., the metadata_version: in your product.yml):  1.7 or higher
+
+## <a id='import'></a>Updating values or property names ##
+
+Tile authors often change the value or name of a property in their tiles when users upgrade from one version to another.  Previously, Ops Manager provided a domain-specific language called `transmogrifier` that was used for such transformations.  Transmogrifier migrations were stored in the `content_migrations` directory of a `EXAMPLE.pivotal` file.  These older transmogrifier migrations were deprecated as of Ops Manager 1.7.
+
+Migrations will now be performed by author-supplied Javascript functions which returns a hash of your tile’s properties. In Ops Manager 1.7, there is a new directory called `migrations` which contain a single .js file. In Ops Man 1.6 or earlier, this directory was called `content_migrations`. The contents of the .js file contain the following js migration functions:
+
+```
+exports.migrate = function(properties) {
+    // Append text to a string
+    properties['job_properties']['web_server']["example_string"]["value"] += "!"; 
+    
+    // Rename property 'example_port' to 'example_port_renamed',
+    // retaining the previous value.
+    properties['job_properties']['web_server']["example_port_renamed"] = 
+        properties['job_properties']['web_server']["example_port"];
+    delete properties['job_properties']['web_server']["example_port"];
+    
+    // Append text to a string list
+    properties['job_properties']['web_server']["example_string_list"]["va lue"].push(
+        "new-string-append-by-migration");
+    
+    return properties;
+};
+```
+
+The properties object passed to your anonymous Javascript migrations function is composed of two two sub-hashes:  `job_properties` and `product_properties`.  These correspond to [job-level](..//partners/product-template-reference.html#job-types) and [product-level](../partners/product-template-reference.html#property-blueprints) properties in a product metadata file.  Assigning new values to keys in either hash, and then returning the modified properties object, causes those properties to be updated.
+
+<p class='note'><strong>Note</strong>: It is the tile author’s responsibility to ensure that your migrations update your product to a state that matches the corresponding product metadata file. Failing to do so would result in a divergence between the property names defined in clean installs of your product (which are based on product.yml) and those defined in upgrades of your product (which are based on the outcome of your migrations).</p>
+
+## <a id='import'></a>Chaining Migrations ##
+
+In Ops Man 1.6 or earlier, migrations .yml files were cumbersome. Ops Man 1.7 or greater introduces migration chaining, which allows for multiple migrations to run sequentially when an upgrade is performed that skips an intermediate version.  For example, suppose you have three versions of your product:  1.6.0, 1.7.0 and 1.7.1.
+
+<img src="../partners/images/chain-migration-scenario.png"/>
+
+The 1.6.0 product was released with 1.6 metadata, so it does not contain any JS migrations (they were not supported before 1.7 metadata).  The 1.7.0 product contains a single JS migration that was written on June 1, 2016.  Migrations are always named in the format YYYYMMDD_HHSS.js and those digits should match when the migration was written.  The subsequent 1.7.1 release of the product contains the first migration plus an additional migration that was written one month later on July 1.  
+
+Let’s look at a couple of different customer upgrade scenarios and what migrations would be run in each (and why).
+
+Scenario A:  Customer upgrades from 1.6.0 -> 1.7.0 -> 1.7.1
+
+The customer starts out with the 1.6.0 product installed from some point in the past.  After upgrading to Ops Manager 1.7 (or higher), he decides to upgrade the product to its 1.7.0.  This will cause the migration 20160601_0000.js to run.  Several weeks later, the customer decides to upgrade from his 1.7.0 to 1.7.1.  Now the 20160701_0000.js migration will run.  Even though the 1.7.1 product includes both migrations, Ops Manager does not re-run 20160601_0000.js because it has a record of what migrations have already run.
 
 This document will be completed soon. In the meantime please review the migration format in the [example product](https://github.com/pivotal-cf-experimental/ops-manager-example/releases), as well as in the [Pivotal Elastic Runtime](https://network.pivotal.io/products/elastic-runtime) tile.
+
+<img src="../partners/images/chain-migration-scenario1.png"/>
+
+Scenario B:  Customer upgrades directly from 1.6.0 -> 1.7.1
+
+In this scenario, the customer also starts out with 1.6.0 installed, but he decides to upgrade directly to 1.7.1 (completely skipping the 1.7.0 intermediate version).  In this case, both migrations will run in lexicographical order.
+
+<img src="../partners/images/chain-migration-scenario2.png"/>
+
+Caption:  Diagram of Scenario B
+
+Scenario C:  Customer installs 1.7.0 initially, then upgrades to 1.7.1
+In this scenario, the customer also starts out with nothing installed.  He decides to do a clean install of version 1.7.0 of the product, i.e., he never touches 1.6.0.  Upon clean install of 1.7.0, no migrations will run because migrations only run on upgrade, not clean install.  Later, this operator decides to upgrade to 1.7.1 of the product.  Since 1.7.1 contains both migrations, and since no migrations have yet been run on this system, you might expect that both migrations will run.  In fact, only the second migration 20160701_0000.js will run.  The reason is that when the 1.7.0 product was installed, the system recorded the fact that 1.7.0 includes 20160601_0000.js, so that migration will not be run in the future.
+
+<img src="../partners/images/chain-migration-scenario3.png"/>
+
+Scenario D:  Customer installs 1.7.1 initially
+
+If the customer does a clean install of 1.7.1, with no previous versions of the product installed, then no migrations are run.  Migrations are only run on upgrade events.
+
+<p class='note'><strong>Note</strong>: We strongly advise that you do not omit a migration from a later version of your tile.  This will break the “chaining” nature of migrations and makes them harder to reason about.  Using the example above, it would be ill-advised to release a 1.7.1 tile without the 20160601_0000.js migration.  Had you done so, the system would not be able to detect that 20160601_0000.js is the same migration that was present in the clean install in Scenario C and unpredictable consequences may obtain.</p>
