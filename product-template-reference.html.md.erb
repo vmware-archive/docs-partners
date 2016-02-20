@@ -41,8 +41,8 @@ The internal name of the product. You must keep the name of your product consist
 String. Required.
 The version of the product. At present you can only import this version into Ops Manager once. If you intend to import the same product / version, you must delete the existing one from the /metadata folder and delete the installation files from Ops Manager's disk. The version number is important for [migrations](./migrations.html).
 
-### minimum_version_for_upgrade
-String. Optional. Set a minimum version for upgrading to your current product version. This example shows a current product version of 1.6 that only upgrades from a 1.5.x version of the same product. 
+### minimum\_version\_for\_upgrade
+String. Optional. Pivotal recommends that you set a minimum version for upgrading to your current product version. This example shows a current product version of 1.6 that only upgrades from a 1.5.x version of the same product. 
 
 ```
 - product_version:  1.6.0.0
@@ -67,7 +67,7 @@ The order in which a product tile appears on the dashboard. The Ops Manager Dire
 
 ### stemcell_criteria
 Hash. Required.
-Refer to [the BOSH hub](https://bosh.io/) for a list of stemcells, including os and version. Notice that you do not specify which IaaS the Stemcell targets. This keeps your product template IaaS agnostic so that one product template can be deployed on any IaaS. 
+Refer to [the BOSH hub](https://bosh.io/) for a list of stemcells, including os and version. Notice that you do not specify which IaaS the Stemcell targets. This keeps your product template IaaS agnostic so that one product template can be deployed on any IaaS. At the time of this writing, none of the BOSH stemcells require a Cloud Provider Interface (CPI). This is expected to change in a future release of BOSH. 
  
 Your product automatically uses the latest patched version of a stemcell by default. For products using static compilations, you can disable this feature. If you set the `float` property to `false`, your product will not receive automatic stemcell updates. 
 
