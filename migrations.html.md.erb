@@ -2,7 +2,7 @@
 title: Migrations
 ---
 
-This document introduces product tile migrations based on Javascript-based syntax for updating values or property names in a metadata file. Tile migration refers to changing the name or value of a property in your product tile when a user upgrades your tile. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
+This topic describes product tile migrations, which refer to changing the name or value of a property in your product tile when a user upgrades your tile. Migrations are performed by user-provided Javascript-based syntax. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
 
 In addition, migrations will be “chaining,”. For example, a user upgrading from version A to C of your product tile will trigger migration A->B and then B->C.   
 
@@ -12,27 +12,30 @@ In addition, migrations will be “chaining,”. For example, a user upgrading f
 
 ## <a id='import'></a>Using JS to update values or property names ##
 
-Tile authors often change the value or name of a property in their tiles when users upgrade from one version to another.  Previously, Ops Manager provided a domain-specific language called `transmogrifier` that was used for such transformations.  In Ops Man 1.6 or earlier, transmogrifier migrations were stored in the `content_migrations` directory of a product tile.  These older transmogrifier migrations were deprecated as of Ops Manager 1.7.
+Previously, Ops Manager provided a domain-specific language called `transmogrifier` to perform tile migrations. Now, tile migrations are performed by user-provided Javascript files.
 
-Migrations will now be performed by author-supplied Javascript functions which returns a hash of your tile’s properties. In Ops Manager 1.7, there is a new directory called `migrations` which contain a single .js file. The contents of the .js file contain the following js migration functions:
+Tile authors who want to perform a tile migration must provide a .js file in the `migrations` directory. Migrations must be named in the format {Timestamp}_{Name}.js. The {Timestamp} must match “YYYYMMDDHHMM” and indicates when the migration was created. The timestamp is used to enforce the order in which migrations run. {Name} is for product authors to provide a human readable name for the migration. For example, `201611060205_example_migration.js` signifies an example of a js migration file with the correct date stamp. 
+
+
+Here are the contents of 201611060205_example_migration.js:
 
 ```
 exports.migrate = function(properties) {
     // Append text to a string
-    properties['job_properties']['web_server']["example_string"]["value"] += "!"; 
+    properties['.web_server.example_string']['value'] += '!'; 
     
     // Rename property 'example_port' to 'example_port_renamed',
     // retaining the previous value.
-    properties['job_properties']['web_server']["example_port_renamed"] = 
-        properties['job_properties']['web_server']["example_port"];
-    delete properties['job_properties']['web_server']["example_port"];
+    properties['.properties.example_port_renamed'] = 
+        properties['.properties.example_port'];
+    delete properties['.properties.example_port'];
     
     // Append text to a string list
-    properties['job_properties']['web_server']["example_string_list"]["va lue"].push(
-        "new-string-append-by-migration");
+    properties['.properties.example_string_list']['value'].push(
+        'new-string-append-by-migration');
     
     return properties;
-};
+}; 
 ```
 
 The properties object passed to your anonymous Javascript migrations function is composed of two two sub-hashes:  `job_properties` and `product_properties`.  These correspond to [job-level](..//partners/product-template-reference.html#job-types) and [product-level](../partners/product-template-reference.html#property-blueprints) properties in a product metadata file.  Assigning new values to keys in either hash, and then returning the modified properties object, causes those properties to be updated.
