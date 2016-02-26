@@ -4,19 +4,28 @@ title: Migrations
 
 This topic discusses product tile migrations, which refers to changing metadata property values when a user upgrades your tile version. The migration is performed by Javascript-based syntax, which tile authors must supply for their product. In addition, this page also discusses chaining migrations. For example, a user upgrading from version A to C of your product tile will trigger migration A->B and then B->C.   
 
+<<<<<<< e71949154619faf57232663d4104649318cdfb83
 
+=======
+>>>>>>> added-tables[#110177484]
 ## Requirements:
 * Ops Manager: 1.7 or higher
 * Product metadata 1.7 or higher: This refers to the `metadata_version:` in your product.yml. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
 
 ## <a id='import'></a>Using JS to update values or property names ##
 
+<<<<<<< e71949154619faf57232663d4104649318cdfb83
 Tile authors who want to perform a tile migration must provide a .js file in the `migrations` directory. Migrations must be named in the format {Timestamp}_{Name}.js. The {Timestamp} must match “YYYYMMDDHHMM” and indicates when the migration was created. The timestamp is used to enforce the order in which migrations run. {Name} is for product authors to provide a human readable name for the migration. For example, `201611060205_example_migration.js` signifies an example of a js migration file with the correct date stamp. 
+=======
+Tile authors often change the value or name of a property in their tiles when users upgrade from one version to another.  Previously, Ops Manager provided a domain-specific language called `transmogrifier` that was used for such transformations.  In Ops Man 1.6 or earlier, transmogrifier migrations were stored in the `content_migrations` directory of a product tile.  These older transmogrifier migrations were deprecated as of Ops Manager 1.7.
+
+>>>>>>> added-tables[#110177484]
 Migrations will now be performed by author-supplied Javascript functions which returns a hash of your tile’s properties. In Ops Manager 1.7, a new directory called `migrations` contains a single .js migration function file. An example of the.js file is shown below:
 
 ```
 exports.migrate = function(properties) {
     // Append text to a string
+<<<<<<< e71949154619faf57232663d4104649318cdfb83
     properties['.web_server.example_string']['value'] += '!'; 
     
     // Rename property 'example_port' to 'example_port_renamed',
@@ -31,6 +40,22 @@ exports.migrate = function(properties) {
     
     return properties;
 }; 
+=======
+    properties['job_properties']['web_server']["example_string"]["value"] += "!"; 
+    
+    // Rename property 'example_port' to 'example_port_renamed',
+    // retaining the previous value.
+    properties['job_properties']['web_server']["example_port_renamed"] = 
+        properties['job_properties']['web_server']["example_port"];
+    delete properties['job_properties']['web_server']["example_port"];
+    
+    // Append text to a string list
+    properties['job_properties']['web_server']["example_string_list"]["value"].push(
+        "new-string-append-by-migration");
+    
+    return properties;
+};
+>>>>>>> added-tables[#110177484]
 ```
 
 The properties object passed to your anonymous Javascript migrations function is composed of properties at the job-level and product-level. Each property's key in the properties object is its property reference from the metadata file. For reference, review the corresponding property names in metadata file in [Tutorial Tile V3](https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v3). The property references are of the form:
