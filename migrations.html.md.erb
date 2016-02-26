@@ -2,22 +2,17 @@
 title: Migrations
 ---
 
-This topic describes product tile migrations, which refer to changing the name or value of a property in your product tile when a user upgrades your tile. Migrations are performed by user-provided Javascript-based syntax. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
+This topic discusses product tile migrations, which refers to changing metadata property values when a user upgrades your tile version. The migration is performed by Javascript-based syntax, which tile authors must supply for their product. In addition, this page also discusses chaining migrations. For example, a user upgrading from version A to C of your product tile will trigger migration A->B and then B->C.   
 
-In addition, migrations will be “chaining,”. For example, a user upgrading from version A to C of your product tile will trigger migration A->B and then B->C.   
 
 ## Requirements:
 * Ops Manager: 1.7 or higher
-* Product metadata (i.e., the metadata_version: in your product.yml):  1.7 or higher
+* Product metadata 1.7 or higher: This refers to the `metadata_version:` in your product.yml. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
 
 ## <a id='import'></a>Using JS to update values or property names ##
 
-Previously, Ops Manager provided a domain-specific language called `transmogrifier` to perform tile migrations. Now, tile migrations are performed by user-provided Javascript files.
-
 Tile authors who want to perform a tile migration must provide a .js file in the `migrations` directory. Migrations must be named in the format {Timestamp}_{Name}.js. The {Timestamp} must match “YYYYMMDDHHMM” and indicates when the migration was created. The timestamp is used to enforce the order in which migrations run. {Name} is for product authors to provide a human readable name for the migration. For example, `201611060205_example_migration.js` signifies an example of a js migration file with the correct date stamp. 
-
-
-Here are the contents of 201611060205_example_migration.js:
+Migrations will now be performed by author-supplied Javascript functions which returns a hash of your tile’s properties. In Ops Manager 1.7, a new directory called `migrations` contains a single .js migration function file. An example of the.js file is shown below:
 
 ```
 exports.migrate = function(properties) {
@@ -38,9 +33,171 @@ exports.migrate = function(properties) {
 }; 
 ```
 
-The properties object passed to your anonymous Javascript migrations function is composed of two two sub-hashes:  `job_properties` and `product_properties`.  These correspond to [job-level](..//partners/product-template-reference.html#job-types) and [product-level](../partners/product-template-reference.html#property-blueprints) properties in a product metadata file.  Assigning new values to keys in either hash, and then returning the modified properties object, causes those properties to be updated.
+The properties object passed to your anonymous Javascript migrations function is composed of properties at the job-level and product-level. Each property's key in the properties object is its property reference from the metadata file. For reference, review the corresponding property names in metadata file in [Tutorial Tile V3](https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v3). The property references are of the form:
 
-<p class='note'><strong>Note</strong>: It is the tile author’s responsibility to ensure that your migrations update your product to a state that matches the corresponding product metadata file. Failing to do so would result in a divergence between the property names defined in clean installs of your product (which are based on product.yml) and those defined in upgrades of your product (which are based on the outcome of your migrations).</p>
+* <code>.properties.{property\_name}</code>  for product-level properties
+* `.{job\_name}.{property\_name}` for job-level properties
+* `.properties.{property\_name}.options.{option\_name}` or `.{job\_name}.{property\_name}.options.{option\_name}` for selector option properties
+
+The object accessed via the property reference contains a 'value' key whose structure is specific to the type of the property. It may be a string, an array or a hash. A list of the structure for each type of property can be found in the reference section below. Assigning new values to keys in either hash, and then returning the modified properties object, causes those properties to be updated.
+
+### <a id='import'></a>Reference:  JS Migrations API
+Inside a Javascript migration function, the following functions are provided by the system for you to call:
+
+```
+console.log(string)
+Arguments:  string
+Return value:  none
+Description:  Prints the string to the Rails log
+Example:
+  console.log(“Hello World”);
+```
+
+```
+getCurrentProductVersion()
+Arguments:  none
+Return value:  string (example:  1.7.1.0)
+Description:  Returns the version of the product that is currently installed
+Example:
+  console.log(getCurrentProductVersion());
+```
+
+```
+generateGUID()
+Arguments:  none
+Return value:  string (example:  115f9ced-3167-4c7c-959b-d52c07f32cbf)
+Description:  Returns a globally unique identifier (GUID) that can be used as the unique identifier for each element of a Collections property.  When updating a Collection property blueprint, you as the migration author are responsible for updating the GUID of each new collection element that you create.
+Notes:  This function can be called a maximum of 100 times per .js file.  If you need more than 100 GUIDs, break your migration into two .js files.
+Example:
+  console.log(“Here's a GUID:  ”+generateGUID())
+```
+
+```
+abortMigration(string)
+Arguments:  string containing error message
+Return value:  none (never returns)
+Description:  Causes the migration to fail immediately.  Rolls back all migrations in the current chain, i.e, no changes will be committed.
+Example:
+  if (something > 5) {
+    abortMigration("Can't upgrade tile when the value of something is more than 5")
+  }
+```
+
+  <table border="1" class="nice">
+    <tr>
+        <th><strong>Property Type</strong></th>
+        <th><strong>'value' structure</strong></th>
+        <th><strong>Example</strong></th>
+    </tr>
+    <tr>
+        <td><code>single-value properties<strong>[1]</strong></code></td>
+        <td>single value, but type-specific</td>
+        <td>properties['.properties.my-prop'].value = 'my-string'; properties['.properties.other-prop'].value = true</td>
+    </tr>
+    <tr>
+        <td><code>dropdown</code></td>
+        <td>array of options</td>
+        <td>properties['.properties.my-prop'].value = ['option1', 'option2']</td>
+    </tr>
+    <tr>
+        <td><code>rsa\_cert\_credentials</code></td>
+        <td>Object</td>
+        <td>properties['.properties.my-prop'].value = {'private\_key\_pem' => 'a-private-key', 'cert\_pem' => 'a-cert-pem'}</td>
+    </tr>
+    <tr>
+        <td><code>rsa_pkey_credentials</code></td>
+        <td>Object</td>
+        <td>properties['.properties.my-prop'].value = {'private\_key\_pem' => 'a-private-key'}</td>
+    </tr>
+    <tr>
+        <td><code>salted\_credentials</code></td>
+        <td>Object</td>
+        <td>properties['.properties.my-prop'].value = {'identity' => 'an-identity', 'salt' => 'mortons', 'password' => 'books'}</td>
+    </tr>
+    <tr>
+        <td><code>simple_credentials</code></td>
+        <td>Object</td>
+        <td>properties['.properties.my-prop'].value = {'identity' => 'an-identity', 'password' => 'secret'}</td>
+    </tr>
+    <tr>
+        <td><code>collections</code></td>
+        <td>Array of objects</td>
+        <td>properties['.properties.my-prop'].value = 
+            [{name: {value: 'foo'}, record_id: {value: 1}},
+            {name: {value: 'bar'}, record_id: {value: 2}}]
+            In this example, each record is composed of two properties: name is a string and record\_id is in an integer.
+    </td>
+    </tr>
+
+<table border="1" class="nice">
+  <tr>
+    <th rowspan="2">Selectors</th>
+    <td>Selected value</td>
+    <td>string</td>
+    <td>properties['.properties.my-prop'].value = 'selected option label'</td>
+  </tr>
+  <tr>
+    <td>{selector option name}.{property name}</td>
+    <td>value object specific to the property type</td>
+    <td>properties['.properties.selector.option1.prop1'].value = 'foo'
+properties['.properties.selector.option1.prop2'].value = 2
+properties['.properties.selector.option2.prop3'].value = ['bar', 'baz']</td>
+  </tr>
+</table>
+
+[1] Single value properties refer to properties whose type are any of the following: boolean, ca\_certificate, domain, dropdown\_select, email, http\_url, integer, ip_address, ip\_ranges, ldap\_url, multi\_select\_options, network\_address, network\_address\_list, port, smtp\_authentication, string, string\_list, text, uuid
+
+Here's an example:
+
+```
+{
+  properties: {
+    '.properties.example_boolean': { value: false } ,
+    '.properties.example_ca_certificate': { value: 'simple-typed-value'},
+    '.properties.example_domain': { value: 'simple-typed-value'} ,
+    '.properties.example_dropdown_select': { value: 'simple-typed-value'},
+    '.properties.example_email': { value: 'simple-typed-value'},
+    '.properties.example_http_url': { value: 'simple-typed-value'},
+    '.properties.example_integer': { value: 111},
+    '.properties.example_ip_address': { value: 'simple-typed-value'},
+    '.properties.example_ip_ranges': { value: 'simple-typed-value'},
+    '.properties.example_ldap_url': { value: 'simple-typed-value'},
+    '.properties.example_multi_select_options': { value: ['simple-typed-value']},
+    '.properties.example_network_address': { value: 'simple-typed-value'},
+    '.properties.example_network_address_list': { value: 'simple-typed-value'},
+    '.properties.example_port': { value: 22},
+    '.properties.example_smtp_authentication': { value: 'simple-typed-value'},
+    '.properties.example_string': { value: 'simple-typed-value'},
+    '.properties.example_string_list': { value: 'simple-typed-value'},
+    '.properties.example_text': { value: 'simple-typed-value'},
+    '.properties.example_uuid': { value: 'simple-typed-value'},
+    '.properties.example_rsa_cert_credentials': {
+      value: {'private_key_pem': 'a-private-key', 'cert_pem':'a-cert-pem'},
+    },
+    '.properties.example_rsa_pkey_credentials': {
+      value: {'private_key_pem':'a-private-key'},
+    },
+    '.properties.example_salted_credentials': {
+      value: {'identity':'an-identity', 'salt':'mortons', 'password':'books'},
+    },
+    '.properties.example_simple_credentials': {
+      value: {'identity':'an-identity', 'password':'secret'},
+    },
+    '.properties.example_collection': [
+      {name: {value: 'foo'}, record_id: {value: 1}},
+      {name: {value: 'bar'}, record_id: {value: 2}}
+    ],
+    '.properties.example_selector': {value: 'option1'},
+    '.properties.selector.option1.prop1': {value: 'foo'},
+    '.properties.selector.option1.prop2': {value: 2},
+    '.properties.selector.option2.prop3': {value: 'bar,baz'}
+  }
+}
+```
+
+It is the tile author’s responsibility to ensure that your migrations update your product to a state that matches the corresponding product metadata file. Failing to do so would result in a divergence between the property names defined in clean installs of your product (which are based on product.yml) and those defined in upgrades of your product (which are based on the outcome of your migrations).
+
+ <p class="note"><strong>Note</strong>: Your pre-1.7 product can be installed on 1.7 version of Ops Manager or on earlier version of Ops Manager. However, for pre-1.7 metadata products, you need to write both a transmogrifier content migration for customers using your product on Ops Manager 1.6 and a javascript migration for those on Ops Manager 1.7. For products with metadata version 1.7+, only javascript migrations are needed.</p>
 
 ## <a id='import'></a>Chaining Migrations ##
 
