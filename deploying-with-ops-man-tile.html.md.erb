@@ -1,7 +1,8 @@
 ---
 title: Deploying Your Product as a Tile in Ops Manager
+owner: Ops Manager
 ---
- 
+
  <p class='note'><strong>Note</strong>: This topic is part of the [Creating a Pivotal Cloud Foundry® Product Tile](./creating.html) tutorial.  Before beginning this procedure, you should follow the procedure described in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html).</p>
 
 This topic describes deploying a Cloud Foundry software product as a tile in [Pivotal Cloud Foundry&reg;](https://network.pivotal.io/products/pivotal-cf) (PCF) Ops Manager. Ops Manager uses BOSH to deploy software products to the cloud, and eases the process by providing the following:
@@ -60,7 +61,7 @@ Download the latest Ops Manager from a shared AMI (Amazon Machine Image) on AWS,
 1. Click the **Ops Manager Director** Tile.<br>
 <%= image_tag 'director.png' %>
 
-1. In the AWS Management Console Config / AWS Config settings, enter values from [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html): 
+1. In the AWS Management Console Config / AWS Config settings, enter values from [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html):
   * **Access Key ID** in the BOSH manifest `bosh.yml`
   * **AWS Secret Key** in the BOSH manifest `bosh.yml`
   * **VPC ID** from **VPC Dashboard > Your VPCs**
@@ -124,7 +125,7 @@ This step describes how you can build a product tile by examining its contents.
 
     1. Metadata <strong>(required)</strong>: This directory includes a product template which renders in Ops Manager, and instructions for how the correlated BOSH manifest is generated.
 
-    1. Releases <strong>(optional)</strong>: This directory contains BOSH releases with the source code for a product. In this case, the release contains the NGINX webserver. 
+    1. Releases <strong>(optional)</strong>: This directory contains BOSH releases with the source code for a product. In this case, the release contains the NGINX webserver.
 
 ## <a id='build-your-own'></a>Step 4: Build your own Product Tile
 
@@ -136,7 +137,7 @@ Create your own product tile by following the steps in these high level instruct
 
 3. You may consider adding Lifecycle Errands to both your BOSH release and your Product Template. Refer to the [BOSH documentation](https://bosh.io/) and the [Lifecycle Errands](./lifecycle-errands.html) topic for more information.
 
-4. Create directory structure for your product folders, guided by the contents of the [Example Product Tile](https://github.com/pivotal-cf-experimental/ops-manager-example/releases), as described above. Archive the folders into a `.zip` file and import the file into a deployed Ops Manager. 
+4. Create directory structure for your product folders, guided by the contents of the [Example Product Tile](https://github.com/pivotal-cf-experimental/ops-manager-example/releases), as described above. Archive the folders into a `.zip` file and import the file into a deployed Ops Manager.
 
 5. SSH into the Ops Manager VM and edit the product template at `/var/tempest/workspace/default/metadata` to directly make changes to your product tile. After making changes, refresh your browser to see the changes. You can click **Apply Changes** in the PCF Ops Manager Installation Dashboard and view the resulting BOSH manifest in `/var/tempest/workspace/default/deployments`.
 
