@@ -140,4 +140,4 @@ Create your own product tile by following the steps in these high level instruct
 
 5. SSH into the Ops Manager VM and edit the product template at `/var/tempest/workspace/default/metadata` to directly make changes to your product tile. After making changes, refresh your browser to see the changes. You can click **Apply Changes** in the PCF Ops Manager Installation Dashboard and view the resulting BOSH manifest in `/var/tempest/workspace/default/deployments`.
 
-6. You must create a migration file to migrate values in subsequent releases of your product. These files use a Ruby gem known as `Transmogrifier`. Refer to the [Migrations](./migrations.html) section more information about building migrations.
+6. You must create a migration file to migrate values in subsequent releases of your product. Refer to the [Migrating Tile Versions](./migrations.html) topic more information about building migrations.
