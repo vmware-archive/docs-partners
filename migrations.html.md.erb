@@ -8,7 +8,7 @@ In Ops Manager 1.6, tile authors were required to write a `.yml` file in domain-
 
 ## Requirements:
 * Ops Manager: 1.7 or higher
-* Product metadata 1.7 or higher: This refers to the `metadata_version` in YOUR-PRODUCT.yml. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
+* Product metadata 1.7 or higher: This refers to the `metadata_version` in `MYPRODUCT.yml`. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
 
 
 ## <a id='import'></a>Update Values or Property Names Using JavaScript##
@@ -212,7 +212,7 @@ Here is an example:
 
 </pre>
 
-It is the tile author’s responsibility to ensure that your migrations update your product to a state that matches the corresponding product metadata file. Failing to do so would result in a divergence between the property names defined in clean installs of your product (which are based on product.yml) and those defined in upgrades of your product (which are based on the outcome of your migrations).
+It is the tile author’s responsibility to ensure that your migrations update your product to a state that matches the corresponding product metadata file. Failing to do so would result in a divergence between the property names defined in clean installs of your product, which are based on `MYPRODUCT.yml`, and those defined in upgrades of your product, which are based on the outcome of your migrations.
 
  <p class="note"><strong>Note</strong>: If your product uses pre-1.7 metadata, you need to write both a transmogrifier content migration for customers using your product on Ops Manager 1.6 and a JavaScript migration for those on Ops Manager 1.7. Review the transmogrifier example in the <a href="https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v1">Tile Tutorial V1</a>.</p>
 
@@ -220,7 +220,7 @@ It is the tile author’s responsibility to ensure that your migrations update y
 
 Migration chaining allows for multiple migrations to run sequentially when an upgrade is performed that skips an intermediate version.  For example, suppose you have three versions of your product:  1.6.0, 1.7.0 and 1.7.1. 
 
-In this example, the 1.6.0 product was released with 1.6 metadata, so it does not contain any JavaScript migrations (they were not supported before 1.7 metadata).  The 1.7.0 product contains a single JavaScript migration that was written on June 1, 2016.    The subsequent 1.7.1 release of the product contains the first migration plus an additional migration that was written one month later on July 1.  
+In this example, the 1.6.0 product was released with 1.6 metadata, so it does not contain any JavaScript migrations.  The 1.7.0 product contains a single JavaScript migration that was written on June 1, 2016.    The subsequent 1.7.1 release of the product contains the first migration plus an additional migration that was written one month later on July 1.  
 
 <%= image_tag("../partners/images/chain-migration-scenario.png") %>
 
