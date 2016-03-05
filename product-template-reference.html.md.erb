@@ -103,6 +103,16 @@ Following this example are definitions of each property.
     - name: example-form
       label: Configurable Properties
       description: All the properties that you can configure!
+      markdown: |
+      ## This is markdown.
+
+      ![Alt text](http://placekitten.com/g/400/200)
+
+      Things to do:
+
+      1. Learn [markdown](https://daringfireball.net/projects/markdown/).
+      1. ...
+      1. Describe your tile.
       property_inputs:
         - reference: .web_server.example_string
           label: Example string
@@ -163,6 +173,14 @@ The label of the form as it appears as a link on the left hand side of each form
 String. Optional.
 The description of the form. Appears at the top of the form as a header.
 
+### markdown
+Markdown. Optional.
+Provide a block of markdown to display at the top of the form. Includes image support. You can use this property to document the tile and provide explanations or references.
+
+### property_inputs
+Array of Hashes. Required.
+References to properties defined in the property_blueprints section of the product template.
+
 ### placeholder
 String. Optional. Specify placeholder text for a field. The text appears in light gray to show an example value for the user. The text disappears when the user types in the field, and reappears if the user leaves the field empty.  
 
@@ -182,10 +200,6 @@ String. Optional. Specify placeholder text for a field. The text appears in ligh
   * network\_address\_list
   * network_address
   * port
-
-### property_inputs
-Array of Hashes. Required.
-References to properties defined in the property_blueprints section of the product template.
 
 ## <a id='simple-vs-complex'></a> Simple vs. Complex Inputs (Selectors and Collections)
 
