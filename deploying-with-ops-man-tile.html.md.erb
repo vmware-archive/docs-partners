@@ -43,22 +43,57 @@ Download the latest Ops Manager from a shared AMI (Amazon Machine Image) on AWS,
 
 1. On the Review Instance Launch page, click **Launch**.
 
-1. In the key pair popup, choose ExampleKeyPair, the keypair you created in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html). Check the "I acknowledge" checkbox and click **Launch Instances**acknowledgement checkbox.
-<%= image_tag 'keypair.png' %>
+1. In the key pair drop-down menu, select **ExampleKeyPair**, the key pair you created in [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html). 
 
-1. Click **Launch Instance**.
+1. Select the acknowledgment checkbox and click **Launch Instances**.
+<%= image_tag 'keypair.png' %>
 
 ## <a id='configure-install'></a>Step 2: Configure and Install Ops Manager Director
 
-1. Find the Ops Manager instance you just deployed by clicking **Instances** under the **EC2 Dashboard**. Note the public IP address listed for the instance.
+1. In the AWS Console, navigate to the EC2 Dashboard.
 
-1. After the Ops Manager instance is fully launched, open a browser tab and navigate to its IP address. Proceed through any privacy warnings.
+1. Record the **Public IP** of your Ops Manager EC2 instance.
 
-1. Create a username and password, and agree to the terms and conditions.
-<%= image_tag 'username-pass.png' %>
+    <%= image_tag("deployed.png") %>
 
-1. Click the **Ops Manager Director** Tile.<br>
-<%= image_tag 'director.png' %>
+1. Open a browser tab and navigate to the Ops Manager IP address. Proceed through any privacy warnings.
+
+1. When Ops Manager starts for the first time, you must choose one of the following:
+    * <strong>[Use an Identity Provider](#idp)</strong>: If you use an Identity Provider, an external identity server maintains your user database.
+    * <strong>[Internal Authentication](#internal)</strong>: If you use Internal Authentication, PCF maintains your user database.
+
+    <%= image_tag("select-authentication.png") %>
+
+### <a id='idp'></a>Use an Identity Provider ###
+
+1. When redirected to the **Use an Identity Provider** page, you must:
+    * Retrieve the metadata URL from your Identity Provider and copy it into the **Use an Identity Provider** area.
+    * Create a passphrase. The passphrase you entered is a shared secret to encrypt Ops Manager data at rest.
+    * Read the **End User License Agreement**, and select the checkbox to accept the terms.
+    * Click **Setup Authentication**.
+
+    <%= image_tag("meta-url.png") %>
+
+1.  Your Identity Provider login page appears. Enter your username and password. Click **Login**.
+
+### <a id='internal'></a>Internal Authentication ###
+
+1.  When redirected to the **Internal Authentication** page, you must:
+    * Enter a **Username** and **Admin password**.
+    * Enter a **Decryption passphrase**. This passphrase encrypts the Ops Manager datastore, and is not recoverable if forgotten.
+    * Read the **End User License Agreement**, and select the checkbox to accept the terms.
+
+    <%= image_tag("om-login.png") %>
+
+1. Log in to Ops Manager with the Admin username and password you created on the initial setup page.
+
+    <%= image_tag("cf-login.png") %>
+
+## <a id='configure-install'></a>Step 3: Access Ops Manager
+
+1. Log in to Ops Manager and click the **Ops Manager Director** Tile.
+<%= image_tag 'om-tile.png' %>
+
 
 1. In the AWS Management Console Config / AWS Config settings, enter values from [Deploying a Pivotal Cloud Foundry&reg; Product Using BOSH](./deploying-with-bosh.html): 
   * **Access Key ID** in the BOSH manifest `bosh.yml`
@@ -104,7 +139,7 @@ Download the latest Ops Manager from a shared AMI (Amazon Machine Image) on AWS,
 
 <p class='note'><strong>Note</strong>: If you have existing VMs in the VPC you can safely ignore errors that IP addresses are already in use.</p>
 
-## <a id='examine-example'></a>Step 3: Download and Examine the Example Product Tile
+## <a id='examine-example'></a>Step 4: Download and Examine the Example Product Tile
 
 This step describes how you can build a product tile by examining its contents.
 
