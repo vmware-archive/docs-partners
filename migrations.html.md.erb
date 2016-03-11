@@ -2,28 +2,28 @@
 title: Migratiing Tile Versions
 ---
 
-This topic discusses product tile migrations, which refer to changing the name and values of properties when a user upgrades tile versions. Tile authors supply a JavaScript file, which Pivotal Cloud Foundry&reg; (PCF) uses to trigger chaining migrations, a process which allows for multiple migrations to run sequentially.  
+This topic discusses product tile migrations, which refers to changing the name and values of properties when a customer upgrades tile versions. Tile authors supply a JavaScript file, which Pivotal Cloud Foundry&reg; (PCF) uses to trigger chaining migrations. Chaining migrations is a process which allows for multiple migrations to run sequentially.  
 
 In Ops Manager 1.6, tile authors were required to write a `.yml` file in domain-specific language called transmogrifier that was used to upgrade tile versions. 
 
-## Requirements:
+## Requirements
 * Ops Manager: 1.7 or higher
-* Product metadata 1.7 or higher: This refers to the `metadata_version` in YOUR-PRODUCT.yml. See the [Product Template Reference](../partners/product-template-reference.html) page for more information regarding metadata property and job names. 
+* Product metadata 1.7 or higher: This refers to the `metadata_version` in EXAMPLE-PRODUCT.yml. See the [Product Template Reference](../partners/product-template-reference.html) topic for more information regarding metadata property and job names. 
 
 
 ## <a id='import'></a>Update Values or Property Names Using JavaScript##
 
-In order to update a product tile, tile authors must:
+To update a product tile, tile authors must complete the following steps:
 
 1. In a single `.js` file, write JavaScript functions which return a hash of the tile’s properties. 
 
-1. Name the file in the format `TIMESTAMP_NAME.js`, where TIMESTAMP is in the form “YYYYMMDDHHMM” and indicates when the author created the migration and where NAME is a human-readable name for the migration; for example, `201606150900_MyProduct.js`. 
+1. Name the file in the format `TIMESTAMP_NAME.js`. TIMESTAMP is in the form “YYYYMMDDHHMM” to indicate when the author created the migration. NAME is a human-readable name for the migration; for example, `201606150900_example-product.js`. 
 
-1. Place the `TIMESTAMP_NAME.js` file in the `PRODUCT/migrations` directory.
+1. Put the `TIMESTAMP_NAME.js` file in the `PRODUCT/migrations` directory.
 
 
-## <a id='import'></a>Example JavaScript Migration File##
-An example migration file is shown below:
+### <a id='import'></a>Example JavaScript Migration File###
+The functions below display an example migration file:
 
 ```
 exports.migrate = function(properties) {
@@ -48,16 +48,16 @@ exports.migrate = function(properties) {
 
 The properties object passed to your anonymous JavaScript migration functions are composed of properties at the [job-level](./product-template-reference.html#job-types) and [product-level](./product-template-reference.html#property-blueprints). Review the property names in the example metadata file in [Tutorial Tile V3](https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v3) for more information. 
 
-Each property's key in the properties object is its property reference from the metadata file. The property references are of the form:
+Each property's key in the properties object is its property reference from the metadata file. Property references take on the form below:
 
 * <code>.properties.{property_name}</code>  for product-level properties
 * `.{job_name}.{property_name}` for job-level properties
 * `.properties.{property_name}.options.{option_name}` or `.{job_name}.{property_name}.options.{option_name}` for selector option properties
 
-The object accessed via the property reference contains a value key whose structure is specific to the type of the property. It may be a string, an array or a hash. A list of the structure for each type of property can be found in the reference section below. Assigning new values to keys in either hash, and then returning the modified properties object, causes those properties to be updated.
+The object accessed through the property reference contains a value key whose structure is specific to the type of the property. Objects may be a string, an array, or a hash. Review the reference below for the structure of each type of property.Assigning new values to keys in either hash and returning the modified properties object causes those properties to be updated.
 
-## <a id='import'></a>Reference:  JavaScript Migrations API
-Inside a JavaScript migration function, the system provides the following functions for you to call:
+## <a id='import'></a>JavaScript Migrations API
+Inside a JavaScript migration function, the system provides the following functions for your code:
 
 ```
 console.log(string)
@@ -105,7 +105,7 @@ Example:
         <th><strong>Example</strong></th>
     </tr>
     <tr>
-        <td><code>single-value properties</code><strong>[1]</strong></td>
+        <td><code>single-value properties</code></td>
         <td>Single value, but type-specific</td>
         <td><code>properties['.properties.my-prop'].value = 'my-string'; properties['.properties.other-prop'].value = true</code></td>
     </tr>
@@ -130,7 +130,7 @@ Example:
         <td><code>properties['.properties.my-prop'].value = {'identity' => 'an-identity', 'salt' => 'mortons', 'password' => 'books'}</code></td>
     </tr>
     <tr>
-        <td><code>simple_credentials</code></td>
+        <td><code>simple\_credentials</code></td>
         <td>Object</td>
         <td><code>properties['.properties.my-prop'].value = {'identity' => 'an-identity', 'password' => 'secret'}</code></td>
     </tr>
@@ -140,7 +140,6 @@ Example:
         <td><code>properties['.properties.my-prop'].value = 
             [{name: {value: 'foo'}, record_id: {value: 1}},
             {name: {value: 'bar'}, record_id: {value: 2}}]</code>
-            In this example, each record is composed of two properties: <code>name</code> is a string and <code>record\_id</code> is in an integer.
     </td>
     </tr>
     <tr>
@@ -160,9 +159,9 @@ Example:
     </tr>
 </table>
 
-[1] Single value properties refer to properties whose type are any of the following: boolean, ca\_certificate, domain, dropdown\_select, email, http\_url, integer, ip_address, ip\_ranges, ldap\_url, multi\_select\_options, network\_address, network\_address\_list, port, smtp\_authentication, string, string\_list, text, uuid.
+<p class="note"><strong>Note</strong>:Single value properties refer to properties whose type are any of the following: boolean, ca\_certificate, domain, dropdown\_select, email, http\_url, integer, ip_address, ip\_ranges, ldap\_url, multi\_select\_options, network\_address, network\_address\_list, port, smtp\_authentication, string, string\_list, text, uuid.</p>
 
-Here is an example:
+View the example properties below:
 
 <pre>
 
@@ -212,42 +211,40 @@ Here is an example:
 
 </pre>
 
-It is the tile author’s responsibility to ensure that your migrations update your product to a state that matches the corresponding product metadata file. Failing to do so would result in a divergence between the property names defined in clean installs of your product (which are based on product.yml) and those defined in upgrades of your product (which are based on the outcome of your migrations).
+The tile author must ensure that migrations are updated to a state that matches the corresponding product metadata file. Failing to do so would result in a divergence between the property names defined in clean installs of your product. 
 
- <p class="note"><strong>Note</strong>: If your product uses pre-1.7 metadata, you need to write both a transmogrifier content migration for customers using your product on Ops Manager 1.6 and a JavaScript migration for those on Ops Manager 1.7. Review the transmogrifier example in the <a href="https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v1">Tile Tutorial V1</a>.</p>
+ <p class="note"><strong>Note</strong>: If your product uses Ops Manager 1.6 or earlier metadata, you need to write both a transmogrifier content migration for customers using your product on 1.6 and a JavaScript migration for those on Ops Manager 1.7. Review the transmogrifier example in the <a href="https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v1">Tile Tutorial V1</a>.</p>
 
-## <a id='import'></a>About Chaining Migrations ##
+## <a id='import'></a>Examples Demonstrating Chaining Migrations ##
 
-Migration chaining allows for multiple migrations to run sequentially when an upgrade is performed that skips an intermediate version.  For example, suppose you have three versions of your product:  1.6.0, 1.7.0 and 1.7.1. 
-
-In this example, the 1.6.0 product was released with 1.6 metadata, so it does not contain any JavaScript migrations (they were not supported before 1.7 metadata).  The 1.7.0 product contains a single JavaScript migration that was written on June 1, 2016.    The subsequent 1.7.1 release of the product contains the first migration plus an additional migration that was written one month later on July 1.  
+Migration chaining allows for multiple migrations to run sequentially when an upgrade is performed that skips an intermediate version.  For example, suppose you have three versions of your product:  1.6.0, 1.7.0, and 1.7.1. The 1.6.0 product contains 1.6 metadata, so it does not contain any JavaScript migrations (they were not supported before 1.7 metadata).  The 1.7.0 product contains a single JavaScript migration that was written on June 1, 2016.    The 1.7.1 release of the product contains the first migration, and an additional migration that was written one month later, on July 1.  
 
 <%= image_tag("../partners/images/chain-migration-scenario.png") %>
 
-The following customer upgrade scenarios illustrate chaining migrations in more detail.
+The following customer upgrade scenarios illustrate chaining migrations in more detail, and utilizes the example product versions described above.
 
-## Scenario A:  Upgrading from 1.6.0 -> 1.7.0 -> 1.7.1
+### Scenario A:  Upgrading from 1.6.0 -> 1.7.0 -> 1.7.1
 
-The customer starts with the 1.6.0 product installed. After upgrading to Ops Manager 1.7 or higher, they decide to upgrade the product to 1.7.0.  This causes the `migration 201606010000_a.js` to run.  Several weeks later, the customer decides to upgrade from his 1.7.0 to 1.7.1.  Now the `201607010000_b.js` migration will run.  Even though the 1.7.1 product includes both migrations, Ops Manager does not re-run `201606010000_a.js` because it has a record of what migrations have already run.
+In this scenario, the customer starts with the 1.6.0 product installed. After upgrading to Ops Manager 1.7 or higher, they decide to upgrade the product to 1.7.0.  This causes the `migration 201606010000_a.js` to run.  Several weeks later, the customer decides to upgrade from his 1.7.0 to 1.7.1.  Now the `201607010000_b.js` migration runs.  Even though the 1.7.1 product includes both migrations, Ops Manager does not re-run `201606010000_a.js`, because it maintains a record of migrations.
 
 <%= image_tag("../partners/images/chain-migration-scenarioA.png") %>
 
-## Scenario B:  Upgrading directly from 1.6.0 -> 1.7.1
+### Scenario B:  Upgrading directly from 1.6.0 -> 1.7.1
 
-In this scenario, the customer also starts with 1.6.0 installed, but they decide to upgrade directly to 1.7.1, skipping the 1.7.0 version.  In this case, both migrations run in lexicographical order.
+In this scenario, the customer also starts with 1.6.0 installed, but they decide to upgrade directly to 1.7.1, skipping the 1.7.0 version.  Both migrations run in lexicographical order.
 
 <%= image_tag("../partners/images/chain-migration-scenarioB.png") %>
 
-## Scenario C:  Installing 1.7.0 initially, then upgrading to 1.7.1
+### Scenario C:  Installing 1.7.0, then upgrading to 1.7.1
 
-In this scenario, the customer starts with nothing installed.  They do a clean install of version 1.7.0 of the product.  On install of 1.7.0, no migrations run because migrations only run on upgrade.  Later, the customer decides to upgrade to 1.7.1 of the product.  Because 1.7.1 contains both migrations, and because no migrations have run on this system, only the second migration `201607010000_b.js` will run.  When the 1.7.0 product was installed, the system recorded the fact that 1.7.0 includes `201606010000_a.js`, so that migration does not run.
+In this scenario, the customer starts with nothing installed. They perform a clean install of version 1.7.0 of the product.  On install of 1.7.0, no migrations run because migrations only run on upgrade.  Later, the customer decides to upgrade to 1.7.1 of the product.  Because 1.7.1 contains both migrations, and because no migrations have run on this system, only the second migration `201607010000_b.js` runs.  The system recorded the fact that 1.7.0 includes `201606010000_a.js`, so that migration does not run.
 
 <%= image_tag("../partners/images/chain-migration-scenarioC.png") %>
 
-## Scenario D:  Installing 1.7.1 initially
+### Scenario D:  Installing 1.7.1 
 
-In this scenario, the customer does a clean install of 1.7.1, with no previous versions of the product installed. In this case, no migrations are run.  Migrations only run on upgrade events.
+In this scenario, the customer performs a clean install of 1.7.1, with no previous versions of the product installed. Since migrations are only triggered by upgrade events, no migrations run.
 
-Do not omit a migration from a later version of your tile.  This will break the “chaining” nature of migrations.  Using the example above, if you release a 1.7.1 tile without the `201606010000_a.js` migration, the system would not be able to detect that `201606010000_b.js` is the same migration that was present in the clean install in Scenario C. 
+<p class="note"><strong>Note</strong>:Do not omit a migration from a later version of your tile.  This breaks the “chaining” nature of migrations.  Using the example above, if you release a 1.7.1 tile without the `201606010000_a.js` migration, the system would not be able to detect that `201606010000_b.js` is the same migration that was present in the clean install in Scenario C.</p> 
 
 
