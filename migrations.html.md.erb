@@ -1,14 +1,12 @@
 ---
-title: Migratiing Tile Versions
+title: Migrating Tile Versions
 ---
 
-This topic discusses product tile migrations, which refers to changing the name and values of properties when a customer upgrades tile versions. Tile authors supply a JavaScript file, which Pivotal Cloud Foundry&reg; (PCF) uses to trigger chaining migrations. Chaining migrations is a process which allows for multiple migrations to run sequentially.  
-
-In Ops Manager 1.6, tile authors were required to write a `.yml` file in domain-specific language called transmogrifier that was used to upgrade tile versions. 
+This topic discusses product tile migrations, which refers to changing the name and values of properties when a customer upgrades tile versions. Tile authors supply a JavaScript file to trigger chaining migrations. Chaining migrations allows for multiple migrations to run sequentially.   
 
 ## Requirements
 * Ops Manager: 1.7 or higher
-* Product metadata 1.7 or higher: This refers to the `metadata_version` in EXAMPLE-PRODUCT.yml. See the [Product Template Reference](../partners/product-template-reference.html) topic for more information regarding metadata property and job names. 
+* Product metadata 1.7 or higher: This refers to the `metadata_version` in EXAMPLE-PRODUCT.yml. See the [Product Template Reference](../partners/product-template-reference.html) topic for more information about metadata property and job names. 
 
 
 ## <a id='import'></a>Update Values or Property Names Using JavaScript##
@@ -17,9 +15,9 @@ To update a product tile, tile authors must complete the following steps:
 
 1. In a single `.js` file, write JavaScript functions which return a hash of the tile’s properties. 
 
-1. Name the file in the format `TIMESTAMP_NAME.js`. TIMESTAMP is in the form “YYYYMMDDHHMM” to indicate when the author created the migration. NAME is a human-readable name for the migration; for example, `201606150900_example-product.js`. 
+1. Name the file in the format `TIMESTAMP_NAME.js`. TIMESTAMP must be in the form “YYYYMMDDHHMM” to indicate when the author created the migration. NAME is a human-readable name for the migration, for example, `201606150900_example-product.js`. 
 
-1. Put the `TIMESTAMP_NAME.js` file in the `PRODUCT/migrations` directory.
+1. Copy the `TIMESTAMP_NAME.js` file to the PRODUCT/migrations directory.
 
 
 ### <a id='import'></a>Example JavaScript Migration File###
@@ -46,15 +44,15 @@ exports.migrate = function(properties) {
 
 ```
 
-The properties object passed to your anonymous JavaScript migration functions are composed of properties at the [job-level](./product-template-reference.html#job-types) and [product-level](./product-template-reference.html#property-blueprints). Review the property names in the example metadata file in [Tutorial Tile V3](https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v3) for more information. 
+The properties object passed to your anonymous JavaScript migration functions are composed of properties at the [job-level](./product-template-reference.html#job-types) and [product-level](./product-template-reference.html#property-blueprints). Review the property names in the example metadata file in [Tutorial Tile V3](https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v3) for more information about job-level and product-level properties. The tile author must update migrations to match the corresponding product metadata file.
 
-Each property's key in the properties object is its property reference from the metadata file. Property references take on the form below:
+Each property's key in the properties object is its property reference from the metadata file. Property references use one of the following forms:
 
 * <code>.properties.{property_name}</code>  for product-level properties
 * `.{job_name}.{property_name}` for job-level properties
 * `.properties.{property_name}.options.{option_name}` or `.{job_name}.{property_name}.options.{option_name}` for selector option properties
 
-The object accessed through the property reference contains a value key whose structure is specific to the type of the property. Objects may be a string, an array, or a hash. Review the reference below for the structure of each type of property.Assigning new values to keys in either hash and returning the modified properties object causes those properties to be updated.
+The object accessed through the property reference contains a value key whose structure is specific to the type of the property. Objects may be a string, an array, or a hash. Review the reference below for the structure of each type of property. 
 
 ## <a id='import'></a>JavaScript Migrations API
 Inside a JavaScript migration function, the system provides the following functions for your code:
@@ -164,7 +162,7 @@ Example:
 
 Single value properties refer to properties whose type are any of the following: boolean, ca\_certificate, domain, dropdown\_select, email, http\_url, integer, ip_address, ip\_ranges, ldap\_url, multi\_select\_options, network\_address, network\_address\_list, port, smtp\_authentication, string, string\_list, text, uuid.
 
-View the example properties below:
+Refer to the example properties below when writing your own tile migration JS file:
 
 <pre>
 
@@ -214,21 +212,20 @@ View the example properties below:
 
 </pre>
 
-The tile author must ensure that migrations are updated to a state that matches the corresponding product metadata file. Failing to do so would result in a divergence between the property names defined in clean installs of your product. 
 
- <p class="note"><strong>Note</strong>: If your product uses Ops Manager 1.6 or earlier metadata, you need to write both a transmogrifier content migration for customers using your product on 1.6 and a JavaScript migration for those on Ops Manager 1.7. Review the transmogrifier example in the <a href="https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v1">Tile Tutorial V1</a>.</p>
+ <p class="note"><strong>Note</strong>: If your product uses Ops Manager 1.6 or earlier metadata, you need to write a transmogrifier content migration for customers using your product on 1.6,and a JavaScript migration for those on Ops Manager 1.7. Review the transmogrifier example in the <a href="https://github.com/pivotal-cf-experimental/ops-manager-example/releases/tag/tutorial-v1">Tile Tutorial V1</a>.</p>
 
 ## <a id='import'></a>Examples Demonstrating Chaining Migrations ##
 
-Migration chaining allows for multiple migrations to run sequentially when an upgrade is performed that skips an intermediate version.  For example, suppose you have three versions of your product:  1.6.0, 1.7.0, and 1.7.1. The 1.6.0 product contains 1.6 metadata, so it does not contain any JavaScript migrations (they were not supported before 1.7 metadata).  The 1.7.0 product contains a single JavaScript migration that was written on June 1, 2016.    The 1.7.1 release of the product contains the first migration, and an additional migration that was written one month later, on July 1.  
+Migration chaining allows for multiple migrations to run sequentially when an upgrade is performed that skips an intermediate version.  For example, suppose you have three versions of your product:  1.6.0, 1.7.0, and 1.7.1. The 1.6.0 product contains 1.6 metadata, so it does not contain any JavaScript migrations.  
 
 <%= image_tag("../partners/images/chain-migration-scenario.png") %>
 
-The following customer upgrade scenarios illustrate chaining migrations in more detail, and utilizes the example product versions described above.
+The following customer upgrade scenarios illustrate chaining migrations in more detail, and use the example product versions described above.
 
 ### Scenario A:  Upgrading from 1.6.0 -> 1.7.0 -> 1.7.1
 
-In this scenario, the customer starts with the 1.6.0 product installed. After upgrading to Ops Manager 1.7 or higher, they decide to upgrade the product to 1.7.0.  This causes the `migration 201606010000_a.js` to run.  Several weeks later, the customer decides to upgrade from his 1.7.0 to 1.7.1.  Now the `201607010000_b.js` migration runs.  Even though the 1.7.1 product includes both migrations, Ops Manager does not re-run `201606010000_a.js`, because it maintains a record of migrations.
+In this scenario, the customer starts with the 1.6.0 product installed. After upgrading to Ops Manager 1.7 or higher, they decide to upgrade the product to 1.7.0.  This causes the `migration 201606010000_a.js` to run.  Several weeks later, the customer decides to upgrade from 1.7.0 to 1.7.1.  Now the `201607010000_b.js` migration runs.  Even though the 1.7.1 product includes both migrations, Ops Manager does not re-run `201606010000_a.js`, because it maintains a record of migrations.
 
 <%= image_tag("../partners/images/chain-migration-scenarioA.png") %>
 
@@ -248,6 +245,6 @@ In this scenario, the customer starts with nothing installed. They perform a cle
 
 In this scenario, the customer performs a clean install of 1.7.1, with no previous versions of the product installed. Since migrations are only triggered by upgrade events, no migrations run.
 
-<p class="note"><strong>Note</strong>: Do not omit a migration from a later version of your tile.  This breaks the “chaining” nature of migrations.  Using the example above, if you release a 1.7.1 tile without the <code>201606010000_a.js</code> migration, the system would not be able to detect that <code>201606010000_b.js</code> is the same migration that was present in the clean install in Scenario C.</p> 
+<p class="note"><strong>Note</strong>: Do not omit a migration from a later version of your tile.  This breaks the “chaining” nature of migrations.  Using the example above, if you release a 1.7.1 tile without the <code>201606010000_a.js</code> migration, the system could not detect that <code>201606010000_b.js</code> is the same migration that was present in the clean install in Scenario C.</p> 
 
 
