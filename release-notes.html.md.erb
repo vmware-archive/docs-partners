@@ -61,8 +61,6 @@ Some BOSH releases that were designed to be deployed with Ops Manager supplied "
 	<span><</span><span>%</span> job_ip = spec.networks.send(spec.networks.methods(false).first).ip <span>%</span><span>></span>		
 </pre>
 
-Audit all uses of spec.networks in job templates.
-
 ##<a id='migration-changes'></a> Migration Changes ##
 * Going forward, you will need to write Javascript migrations for any releases you wish to upgrade to within Ops Manager 1.7. Products with the older-style migrations will still import and operate correctly within 1.7 upon Ops Manager upgrade. Ops Manager 1.7 introduces a new Javascript-based syntax for tile migrations (The phrase  “tile migration” refers to changing the name or value of a property in your product tile when a user upgrades your tile).  Migrations will now be performed by author-supplied Javascript functions that take in a tile and return a hash of your tile's properties. Moreover, migrations will be “chaining,” i.e., a user upgrading from version A to C of your product will trigger migration A&#8594;B and then B&#8594;C. We recommend that, within the 1.7 release timeframe, you produce and release a patch release of your current product that includes a Javascript migration as well as the existing older syntax in order to account for upgrades within either 1.6 or 1.7 Ops Manager. Both migration styles can be used in the same tile release.
 <p class="note"><strong>Note</strong>: This is only necessary for your next release after 1.7 Ops Manager is released.</p>
